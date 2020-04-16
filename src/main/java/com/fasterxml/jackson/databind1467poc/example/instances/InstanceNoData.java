@@ -1,13 +1,13 @@
-package com.fasterxml.jackson.databind1467poc.instances;
+package com.fasterxml.jackson.databind1467poc.example.instances;
 
 import com.fasterxml.jackson.databind1467poc.theory.DeserializationStepInstance;
 import com.fasterxml.jackson.databind1467poc.theory.False;
 
 import java.util.List;
 
-public abstract class StepInstanceNoData extends StepInstanceHavingDependencies<False> {
+public abstract class InstanceNoData extends InstanceHavingUnmanagedDependencies<False> {
 
-  public StepInstanceNoData(List<DeserializationStepInstance<?>> dependencies) {
+  public InstanceNoData(List<DeserializationStepInstance<?>> dependencies) {
     super(dependencies);
   }
 

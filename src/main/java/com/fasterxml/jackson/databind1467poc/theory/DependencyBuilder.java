@@ -5,8 +5,4 @@ public interface DependencyBuilder<
   Tb extends HasDependencies<?>
 > extends HasDependencies<Td> {
 
-  void addDependency(Td dependency);
-
-  Tb build();
-
 }

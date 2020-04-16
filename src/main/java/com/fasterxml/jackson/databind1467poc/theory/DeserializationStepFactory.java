@@ -1,6 +1,8 @@
 package com.fasterxml.jackson.databind1467poc.theory;
 
-import java.util.List;
+import com.fasterxml.jackson.core.JsonToken;
+
+import static com.fasterxml.jackson.core.JsonToken.*;
 
 public interface DeserializationStepFactory {
 
@@ -8,39 +10,44 @@ public interface DeserializationStepFactory {
 
   <T> DeserializationStepBuilder<T> builderDeserializeStandardType(TypeConfiguration<T> desc);
 
-  <T> DeserializationStepBuilder<T> builderInstantiateUsingDefaultConstructor();
+  <T> DeserializationStepBuilder<T> builderInstantiateUsingDefaultConstructor(TypeConfiguration<T> desc);
 
   <T> DeserializationStepBuilder<T> builderInstantiateUsing(CreatorConfiguration<T> creatorConf);
 
-  DeserializationStepBuilder<False> builderReadStartOfObjectToken();
+  DeserializationStepBuilder<False> builderExpectTokenKind(JsonToken kind);
 
-  DeserializationStepBuilder<False> builderReadEndOfObjectToken();
+  DeserializationStepBuilder<False> builderExpectToken(JsonToken kind, Object token);
 
-  DeserializationStepBuilder<String> builderReadFieldName();
+  <T> DeserializationStepBuilder<T> builderDeserializeArray(TypeConfiguration<T> conf);
 
-  <T> DeserializationStepBuilder<List<T>> builderReadArray();
-
-  <T> DeserializationStepBuilder<T> builderDeserializeProperty(PropertyConfiguration<T> desc);
+  default <T> DeserializationStepBuilder<T> builderDeserializeProperty(PropertyConfiguration<T> desc) {
+    final DeserializationStepBuilder<T> builder = builderDeserializeValue(desc.getTypeConfiguration());
+    builder.addDependency(builderExpectToken(FIELD_NAME, desc.getName()).build());
+    return builder;
+  }
 
   default <T> DeserializationStepBuilder<T> builderDeserializeValue(TypeConfiguration<T> conf) {
     if (conf.isStandardType()) {
       return builderDeserializeStandardType(conf);
     }
+    if (conf.isCollection()) {
+      return builderDeserializeArray(conf);
+    }
     final DeserializationStepBuilder<T> builderStepInstantiate =
       conf.hasCreator()
       ? builderInstantiateUsing(conf.getCreatorConfiguration())
-      : builderInstantiateUsingDefaultConstructor();
-    builderStepInstantiate.addDependency(builderReadStartOfObjectToken().build());
+      : builderInstantiateUsingDefaultConstructor(conf);
+    builderStepInstantiate.addDependency(builderExpectTokenKind(START_OBJECT).build());
     final DeserializationStepBuilder<T> builderStepWriteProperties =
       builderStepAlso(builderStepInstantiate.build());
     conf
       .getProperties()
       .stream()
       .map(this::builderDeserializeProperty)
-      .map(DependencyBuilder::build)
+      .map(DeserializationStepBuilder::build)
       .forEach(builderStepWriteProperties::addDependency);
     final DeserializationStepBuilder<T> builderRoot = builderStepAlso(builderStepWriteProperties.build());
-    builderRoot.addDependency(builderReadEndOfObjectToken().build());
+    builderRoot.addDependency(builderExpectTokenKind(END_OBJECT).build());
     return builderRoot;
   }
 

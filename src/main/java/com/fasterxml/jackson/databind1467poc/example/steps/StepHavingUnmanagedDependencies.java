@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.databind1467poc.steps;
+package com.fasterxml.jackson.databind1467poc.example.steps;
 
 import com.fasterxml.jackson.databind1467poc.theory.DeserializationStep;
 import com.fasterxml.jackson.databind1467poc.theory.DeserializationStepInstance;
@@ -7,11 +7,11 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-public abstract class StepHavingDependencies<T> implements DeserializationStep<T> {
+public abstract class StepHavingUnmanagedDependencies<T> implements DeserializationStep<T> {
 
   private final List<DeserializationStep<?>> dependencies;
 
-  protected StepHavingDependencies(List<DeserializationStep<?>> dependencies) {
+  protected StepHavingUnmanagedDependencies(List<DeserializationStep<?>> dependencies) {
     this.dependencies = dependencies;
   }
 
