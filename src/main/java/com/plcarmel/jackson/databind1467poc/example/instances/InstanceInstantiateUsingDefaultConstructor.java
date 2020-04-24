@@ -7,8 +7,9 @@ import com.plcarmel.jackson.databind1467poc.theory.TypeConfiguration;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.function.Consumer;
 
-public class InstanceInstantiateUsingDefaultConstructor<T> extends InstanceHavingUnmanagedDependencies<T> {
+public final class InstanceInstantiateUsingDefaultConstructor<T> extends InstanceHavingUnmanagedDependencies<T> {
 
   private final Constructor<T> constructor;
   private T data;
@@ -20,6 +21,7 @@ public class InstanceInstantiateUsingDefaultConstructor<T> extends InstanceHavin
     super(dependencies);
     try { constructor = typeConfiguration.getTypeClass().getConstructor(); }
     catch(NoSuchMethodException e) { throw new RuntimeException(e); }
+    this.registerAsParent();
   }
 
   @Override
@@ -48,8 +50,7 @@ public class InstanceInstantiateUsingDefaultConstructor<T> extends InstanceHavin
   }
 
   @Override
-  public void update() {
-    super.update();
+  public void prune(Consumer<DeserializationStepInstance<?>> onRemoved) {
     if (data == null) {
       try {
         data = constructor.newInstance();
@@ -57,6 +58,7 @@ public class InstanceInstantiateUsingDefaultConstructor<T> extends InstanceHavin
         throw new RuntimeException(e);
       }
     }
+    super.prune(onRemoved);
   }
 
 }

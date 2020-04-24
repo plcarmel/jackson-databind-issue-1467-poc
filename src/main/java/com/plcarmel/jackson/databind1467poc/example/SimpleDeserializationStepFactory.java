@@ -10,6 +10,12 @@ import com.plcarmel.jackson.databind1467poc.theory.*;
 
 public class SimpleDeserializationStepFactory implements DeserializationStepFactory {
 
+  private static final SimpleDeserializationStepFactory instance = new SimpleDeserializationStepFactory();
+
+  public static SimpleDeserializationStepFactory getInstance() { return instance; }
+
+  private SimpleDeserializationStepFactory() {}
+
   @Override
   public <T> DeserializationStepBuilder<T> builderStepAlso(DeserializationStep<T> mainDependency) {
     return new BasicBuilder<>(l -> new StepAlso<>(mainDependency, l));

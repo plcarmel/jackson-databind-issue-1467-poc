@@ -12,7 +12,7 @@ import java.util.*;
 
 import static com.fasterxml.jackson.core.JsonToken.VALUE_TRUE;
 
-public class InstanceDeserializeStandardValue<T> extends InstanceHavingUnmanagedDependencies<T> {
+public final class InstanceDeserializeStandardValue<T> extends InstanceHavingUnmanagedDependencies<T> {
 
   private final PropertyConfiguration<T> conf;
   private T data;
@@ -24,6 +24,7 @@ public class InstanceDeserializeStandardValue<T> extends InstanceHavingUnmanaged
   ) {
     super(dependencies);
     this.conf = conf;
+    this.registerAsParent();
   }
 
   @Override

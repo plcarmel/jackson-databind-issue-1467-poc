@@ -10,19 +10,18 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static com.rainerhahnekamp.sneakythrow.Sneaky.sneaked;
-import static java.util.stream.Collectors.toUnmodifiableMap;
-import static java.util.stream.Collectors.toUnmodifiableSet;
+import static java.util.stream.Collectors.*;
 
 public class SupportedTypes {
 
   public final static Set<Class<?>> booleanClasses =
-    Set.of(
+    Stream.of(
       boolean.class,
       Boolean.class
-    );
+    ).collect(toSet());
 
   public final static Set<Class<?>> integerClasses =
-    Set.of(
+    Stream.of(
       byte.class,
       short.class,
       int.class,
@@ -33,25 +32,25 @@ public class SupportedTypes {
       Long.class,
       BigInteger.class,
       Number.class
-    );
+    ).collect(toSet());
 
   public final static Set<Class<?>> decimalClasses =
-    Set.of(
+    Stream.of(
       float.class,
       double.class,
       Float.class,
       Double.class,
       BigDecimal.class,
       Number.class
-    );
+    ).collect(toSet());
 
   public final static Set<Class<?>> stringClasses =
-    Set.of(
+    Stream.of(
       String.class
-    );
+    ).collect(toSet());
 
   public final static Set<Class<?>> collectionClasses =
-    Set.of(
+    Stream.of(
       Collection.class,
       List.class,
       Set.class,
@@ -59,7 +58,7 @@ public class SupportedTypes {
       LinkedList.class,
       HashSet.class,
       SortedSet.class
-    );
+    ).collect(toSet());
 
   public final static Set<Class<?>> standardTypeClasses =
     Stream.of(
@@ -67,16 +66,16 @@ public class SupportedTypes {
       integerClasses,
       decimalClasses,
       stringClasses
-    ).flatMap(Set::stream).collect(toUnmodifiableSet());
+    ).flatMap(Set::stream).collect(toSet());
 
   public final static Set<Class<?>> numberClasses =
     Stream.of(
       integerClasses,
       decimalClasses
-    ).flatMap(Set::stream).collect(toUnmodifiableSet());
+    ).flatMap(Set::stream).collect(toSet());
 
   public final static Set<Class<?>> primitiveTypes =
-    Set.of(
+    Stream.of(
       boolean.class,
       byte.class,
       short.class,
@@ -84,18 +83,17 @@ public class SupportedTypes {
       long.class,
       float.class,
       double.class
-    );
+    ).collect(toSet());
 
   public final static Map<Class<?>, Class<?>> unboxedToBoxed =
     Stream.of(
-      entry(int.class, Integer.class),
       entry(byte.class, Byte.class),
       entry(short.class, Short.class),
       entry(int.class, Integer.class),
       entry(long.class, Long.class),
       entry(float.class, Float.class),
       entry(double.class, Double.class)
-    ).collect(toUnmodifiableMap(SupportedTypes::key, SupportedTypes::value));;
+    ).collect(toMap(SupportedTypes::key, SupportedTypes::value));;
 
   private static <K,V> Map.Entry<K,V> entry(K k, V v) {
     return new AbstractMap.SimpleImmutableEntry<>(k,v);
@@ -111,8 +109,6 @@ public class SupportedTypes {
 
   public final static Map<Class<?>, Function<JsonParser, ?>> typeToValueParser =
     Stream.of(
-      entry(int.class, sneaked(JsonParser::getIntValue)),
-      entry(Integer.class, sneaked(JsonParser::getIntValue)),
       entry(byte.class, sneaked(JsonParser::getByteValue)),
       entry(Byte.class, sneaked(JsonParser::getByteValue)),
       entry(short.class, sneaked(JsonParser::getShortValue)),
@@ -127,14 +123,14 @@ public class SupportedTypes {
       entry(Double.class, sneaked(JsonParser::getDoubleValue)),
       entry(BigInteger.class, sneaked(JsonParser::getBigIntegerValue)),
       entry(BigDecimal.class, sneaked(JsonParser::getDecimalValue))
-    ).collect(toUnmodifiableMap(SupportedTypes::key, SupportedTypes::value));
+    ).collect(toMap(SupportedTypes::key, SupportedTypes::value));
 
   public final static Map<JsonToken, Set<Class<?>>> tokenToSupportedTypes =
-    Map.of(
-      JsonToken.VALUE_NUMBER_FLOAT, numberClasses,
-      JsonToken.VALUE_NUMBER_INT, integerClasses,
-      JsonToken.VALUE_STRING, stringClasses,
-      JsonToken.VALUE_FALSE, booleanClasses,
-      JsonToken.VALUE_TRUE, booleanClasses
-    );
+    Stream.of(
+      entry(JsonToken.VALUE_NUMBER_FLOAT, numberClasses),
+      entry(JsonToken.VALUE_NUMBER_INT, integerClasses),
+      entry(JsonToken.VALUE_STRING, stringClasses),
+      entry( JsonToken.VALUE_FALSE, booleanClasses),
+      entry(JsonToken.VALUE_TRUE, booleanClasses)
+    ).collect(toMap(SupportedTypes::key, SupportedTypes::value));
 }

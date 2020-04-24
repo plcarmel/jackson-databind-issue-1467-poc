@@ -3,8 +3,9 @@ package com.plcarmel.jackson.databind1467poc.example.instances;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
 
 import java.util.List;
+import java.util.function.Consumer;
 
-public abstract class InstanceHavingUnmanagedDependencies<T> implements DeserializationStepInstance<T> {
+public abstract class InstanceHavingUnmanagedDependencies<T> extends InstanceBase<T> {
 
   private final List<DeserializationStepInstance<?>> dependencies;
 
@@ -22,10 +23,18 @@ public abstract class InstanceHavingUnmanagedDependencies<T> implements Deserial
   }
 
   @Override
-  public void update() {
+  public void prune(Consumer<DeserializationStepInstance<?>> onRemoved) {
     for (int i = 0; i < dependencies.size(); ) {
-      if (dependencies.get(i).isDone()) dependencies.remove(i);
+      final DeserializationStepInstance<?> d = dependencies.get(i);
+      if (d.isDone()) {
+        d.removeParent(this);
+        dependencies.remove(i);
+        onRemoved.accept(d);
+      }
       else i++;
+    }
+    if (isDone()) {
+      getParents().forEach(p -> p.prune(onRemoved));
     }
   }
 }

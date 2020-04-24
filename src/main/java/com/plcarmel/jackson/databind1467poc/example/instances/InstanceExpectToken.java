@@ -8,7 +8,9 @@ import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
 import java.io.IOException;
 import java.util.List;
 
-public class InstanceExpectToken extends InstanceNoData {
+import static java.util.Collections.emptyList;
+
+public final class InstanceExpectToken extends InstanceNoData {
 
   private final JsonToken expectedTokenKind;
   private final Object expectedTokenValue;
@@ -25,6 +27,7 @@ public class InstanceExpectToken extends InstanceNoData {
     this.expectedTokenKind = expectedTokenKind;
     this.expectedTokenValue = expectedTokenValue;
     useTokenValue = true;
+    this.registerAsParent();
   }
 
   public InstanceExpectToken(
@@ -63,7 +66,7 @@ public class InstanceExpectToken extends InstanceNoData {
 
   @Override
   public List<DeserializationStepInstance<?>> getDependencies() {
-    return null;
+    return emptyList();
   }
 
 }

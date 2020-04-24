@@ -3,13 +3,13 @@ package com.plcarmel.jackson.databind1467poc.example.instances;
 import com.fasterxml.jackson.core.JsonParser;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
-public class InstanceAlso<T> extends InstanceHavingUnmanagedDependencies<T> {
+public final class InstanceAlso<T> extends InstanceHavingUnmanagedDependencies<T> {
 
   private DeserializationStepInstance<T> mainDependency;
   private T data;
@@ -20,6 +20,7 @@ public class InstanceAlso<T> extends InstanceHavingUnmanagedDependencies<T> {
   ) {
     super(otherDependencies);
     this.mainDependency = mainDependency;
+    this.registerAsParent();
   }
 
   @Override
@@ -33,8 +34,8 @@ public class InstanceAlso<T> extends InstanceHavingUnmanagedDependencies<T> {
   }
 
   @Override
-  public void pushToken(JsonParser parser) throws IOException {
-    // NOP
+  public void pushToken(JsonParser parser) {
+    throw new RuntimeException("Method should not be called.");
   }
 
   @Override
@@ -54,9 +55,14 @@ public class InstanceAlso<T> extends InstanceHavingUnmanagedDependencies<T> {
   }
 
   @Override
-  public void update() {
-    super.update();
-    if (mainDependency.isDone()) mainDependency = null;
+  public void prune(Consumer<DeserializationStepInstance<?>> onRemoved) {
+    if ( mainDependency != null && mainDependency.isDone()) {
+      data = mainDependency.getData();
+      mainDependency.removeParent(this);
+      onRemoved.accept(mainDependency);
+      mainDependency = null;
+    }
+    super.prune(onRemoved);
   }
 
   @Override

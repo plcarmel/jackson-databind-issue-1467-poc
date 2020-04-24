@@ -1,14 +1,22 @@
 package com.plcarmel.jackson.databind1467poc.theory;
 
+import java.util.Set;
+import java.util.function.Consumer;
+
 public interface DeserializationStepInstance<T>
-  extends HasDependencies<DeserializationStepInstance<?>>, TokenConsumer
+  extends HasDependencies<DeserializationStepInstance<?>>, AsynchronousDeserialization<T>
 {
   boolean isOptional();
   boolean isDone();
   boolean areDependenciesSatisfied();
 
-  T getData();
+  Set<DeserializationStepInstance<?>> getParents();
 
-  void update();
+  void addParent(DeserializationStepInstance<?> parent);
+  void removeParent(DeserializationStepInstance<?> parent);
+
+  void prune(Consumer<DeserializationStepInstance<?>> onRemoved);
+
+  void destroy();
 
 }

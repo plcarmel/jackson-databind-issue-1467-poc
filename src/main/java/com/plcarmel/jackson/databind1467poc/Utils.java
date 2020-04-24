@@ -6,12 +6,12 @@ import java.util.stream.Collectors;
 
 public class Utils {
 
-  static <T> List<List<T>> topologicalSort(T startingPoint, Function<T, Collection<T>> getNodes) {
-    final List<List<T>> result = new ArrayList<>();
+  public static <T> List<T> topologicalSort(T startingPoint, Function<T, Collection<T>> getNodes) {
+    final List<T> result = new ArrayList<>();
     final Set<T> visited = new HashSet<>();
     List<T> lastElements = Collections.singletonList(startingPoint);
     while (!lastElements.isEmpty()) {
-      result.add(lastElements);
+      result.addAll(lastElements);
       visited.addAll(lastElements);
       lastElements =
         lastElements
