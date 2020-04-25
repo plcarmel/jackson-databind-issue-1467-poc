@@ -1,9 +1,10 @@
 package com.plcarmel.jackson.databind1467poc.theory;
 
-public interface PropertyConfiguration<T> {
+public interface PropertyConfiguration<TClass, TProperty> {
 
   String getName();
-  TypeConfiguration<T> getTypeConfiguration();
+  Class<TClass> getDeclaringClass();
+  TypeConfiguration<TProperty> getTypeConfiguration();
   boolean isRequired();
 
 }

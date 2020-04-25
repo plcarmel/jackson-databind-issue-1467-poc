@@ -2,10 +2,7 @@ package com.plcarmel.jackson.databind1467poc.example;
 
 import com.fasterxml.jackson.core.JsonToken;
 import com.plcarmel.jackson.databind1467poc.example.builders.BasicBuilder;
-import com.plcarmel.jackson.databind1467poc.example.steps.StepAlso;
-import com.plcarmel.jackson.databind1467poc.example.steps.StepDeserializeStandardValue;
-import com.plcarmel.jackson.databind1467poc.example.steps.StepExpectToken;
-import com.plcarmel.jackson.databind1467poc.example.steps.StepInstantiateUsingDefaultConstructor;
+import com.plcarmel.jackson.databind1467poc.example.steps.*;
 import com.plcarmel.jackson.databind1467poc.theory.*;
 
 public class SimpleDeserializationStepFactory implements DeserializationStepFactory {
@@ -37,12 +34,12 @@ public class SimpleDeserializationStepFactory implements DeserializationStepFact
   }
 
   @Override
-  public DeserializationStepBuilder<False> builderExpectTokenKind(JsonToken expectedTokenKind) {
+  public DeserializationStepBuilder<NoData> builderExpectTokenKind(JsonToken expectedTokenKind) {
     return new BasicBuilder<>(l -> new StepExpectToken(expectedTokenKind, l));
   }
 
   @Override
-  public DeserializationStepBuilder<False> builderExpectToken(
+  public DeserializationStepBuilder<NoData> builderExpectToken(
     JsonToken expectedTokenKind,
     Object expectedTokenValue
   ) {
@@ -52,6 +49,15 @@ public class SimpleDeserializationStepFactory implements DeserializationStepFact
   @Override
   public <T> DeserializationStepBuilder<T> builderDeserializeArray(TypeConfiguration<T> conf) {
     throw new RuntimeException("Not implemented");
+  }
+
+  @Override
+  public <T> DeserializationStepBuilder<NoData> builderSetProperty(
+    PropertyConfiguration<T> conf,
+    DeserializationStep<?> instantiationStep,
+    DeserializationStep<T> valueDeserializationStep
+  ) {
+    return new BasicBuilder<>(l -> new StepDeserializeProperty<>(conf, instantiationStep, valueDeserializationStep, l));
   }
 
 }

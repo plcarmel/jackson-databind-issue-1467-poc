@@ -29,7 +29,7 @@ public abstract class InstanceBase<T> implements DeserializationStepInstance<T> 
   }
 
   @Override
-  public void destroy() {
-    getDependencies().forEach(d -> d.removeParent(this));
+  public void complete() {
+    getDependencies().forEach(DeserializationStepInstance::complete);
   }
 }

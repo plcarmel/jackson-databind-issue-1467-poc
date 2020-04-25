@@ -38,8 +38,13 @@ public class BeanTypeConfiguration<T> implements TypeConfiguration<T> {
   }
 
   @Override
-  public Collection<PropertyConfiguration<?>> getProperties() {
-    return Arrays.stream(typeClass.getFields()).map(FieldPropertyConfiguration::new).collect(toList());
+  public Collection<PropertyConfiguration<T, ?>> getProperties() {
+    //noinspection unchecked
+    return Arrays
+      .stream(typeClass.getFields())
+      .map(FieldPropertyConfiguration::new)
+      .map(p -> (PropertyConfiguration<T, ?>) p)
+      .collect(toList());
   }
 
   @Override

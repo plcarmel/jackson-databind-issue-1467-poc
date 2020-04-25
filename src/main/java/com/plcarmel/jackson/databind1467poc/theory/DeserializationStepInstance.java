@@ -17,6 +17,6 @@ public interface DeserializationStepInstance<T>
 
   void prune(Consumer<DeserializationStepInstance<?>> onRemoved);
 
-  void destroy();
+  void complete();
 
 }

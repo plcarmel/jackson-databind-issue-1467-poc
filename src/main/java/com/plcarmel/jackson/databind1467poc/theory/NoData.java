@@ -1,7 +1,7 @@
 package com.plcarmel.jackson.databind1467poc.theory;
 
-public class False {
+public class NoData {
 
-  private False() {}
+  private NoData() {}
 
 }

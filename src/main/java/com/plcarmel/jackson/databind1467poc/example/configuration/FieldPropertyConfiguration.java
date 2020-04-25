@@ -7,10 +7,10 @@ import com.plcarmel.jackson.databind1467poc.theory.TypeConfiguration;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
-public class FieldPropertyConfiguration<T> implements PropertyConfiguration<T> {
+public class FieldPropertyConfiguration<TClass, TProperty> implements PropertyConfiguration<TClass, TProperty> {
 
   private final Field field;
-  private final TypeConfiguration<T> typeConfiguration;
+  private final TypeConfiguration<TProperty> typeConfiguration;
   private final boolean isRequired;
 
   public FieldPropertyConfiguration(Field field) {
@@ -21,7 +21,7 @@ public class FieldPropertyConfiguration<T> implements PropertyConfiguration<T> {
         .anyMatch(JsonProperty::required);
     //noinspection unchecked
     typeConfiguration =
-      (TypeConfiguration<T>) CachedTypeConfigurationFactory
+      (TypeConfiguration<TProperty>) CachedTypeConfigurationFactory
         .getInstance()
         .getTypeConfiguration(field.getDeclaringClass());
   }
@@ -32,7 +32,13 @@ public class FieldPropertyConfiguration<T> implements PropertyConfiguration<T> {
   }
 
   @Override
-  public TypeConfiguration<T> getTypeConfiguration() {
+  public Class<TClass> getDeclaringClass() {
+    //noinspection unchecked
+    return (Class<TClass>) field.getDeclaringClass();
+  }
+
+  @Override
+  public TypeConfiguration<TProperty> getTypeConfiguration() {
     return typeConfiguration;
   }
 

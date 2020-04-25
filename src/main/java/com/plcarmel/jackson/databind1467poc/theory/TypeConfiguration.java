@@ -11,7 +11,7 @@ public interface TypeConfiguration<T> {
 
   CreatorConfiguration<T> getCreatorConfiguration();
 
-  Collection<PropertyConfiguration<?>> getProperties();
+  Collection<PropertyConfiguration<T, ?>> getProperties();
 
   Class<T> getTypeClass();
 }

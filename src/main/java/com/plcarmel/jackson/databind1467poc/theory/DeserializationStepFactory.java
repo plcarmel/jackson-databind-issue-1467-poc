@@ -8,20 +8,28 @@ public interface DeserializationStepFactory {
 
   <T> DeserializationStepBuilder<T> builderStepAlso(DeserializationStep<T> mainDependency);
 
-  <T> DeserializationStepBuilder<T> builderDeserializeStandardType(PropertyConfiguration<T> conf);
+  <T> DeserializationStepBuilder<T> builderDeserializeStandardType(PropertyConfiguration<?, T> conf);
 
   <T> DeserializationStepBuilder<T> builderInstantiateUsingDefaultConstructor(TypeConfiguration<T> conf);
 
   <T> DeserializationStepBuilder<T> builderInstantiateUsing(CreatorConfiguration<T> creatorConf);
 
-  DeserializationStepBuilder<False> builderExpectTokenKind(JsonToken kind);
+  DeserializationStepBuilder<NoData> builderExpectTokenKind(JsonToken kind);
 
-  DeserializationStepBuilder<False> builderExpectToken(JsonToken kind, Object token);
+  DeserializationStepBuilder<NoData> builderExpectToken(JsonToken kind, Object token);
 
   <T> DeserializationStepBuilder<T> builderDeserializeArray(TypeConfiguration<T> conf);
 
-  default <T> DeserializationStepBuilder<T> builderDeserializeProperty(PropertyConfiguration<T> conf) {
-    final DeserializationStepBuilder<T> builder = builderDeserializeValue(conf);
+  <TClass, TProperty> DeserializationStepBuilder<NoData> builderSetProperty(
+    PropertyConfiguration<TClass, TProperty> conf,
+    DeserializationStep<TClass> instantiationStep,
+    DeserializationStep<TProperty> valueDeserializationStep
+  );
+
+  default <TClass, TProperty> DeserializationStepBuilder<TProperty> builderDeserializeProperty(
+    PropertyConfiguration<TClass, TProperty> conf
+  ) {
+    final DeserializationStepBuilder<TProperty> builder = builderDeserializeValue(conf);
     builder.addDependency(builderExpectToken(FIELD_NAME, conf.getName()).build());
     return builder;
   }

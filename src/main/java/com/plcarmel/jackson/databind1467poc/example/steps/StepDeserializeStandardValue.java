@@ -10,10 +10,10 @@ import java.util.List;
 
 public class StepDeserializeStandardValue<T> extends StepHavingUnmanagedDependencies<T> {
 
-  private final PropertyConfiguration<T> conf;
+  private final PropertyConfiguration<?, T> conf;
 
   public StepDeserializeStandardValue(
-    PropertyConfiguration<T> conf,
+    PropertyConfiguration<?, T> conf,
     List<DeserializationStep<?>> dependencies
   ) {
     super(dependencies);
@@ -22,7 +22,7 @@ public class StepDeserializeStandardValue<T> extends StepHavingUnmanagedDependen
 
   @Override
   public DeserializationStepInstance<T> instantiated() {
-    return new InstanceDeserializeStandardValue<T>(conf, instantiatedDependencies());
+    return new InstanceDeserializeStandardValue<>(conf, instantiatedDependencies());
   }
 
 }

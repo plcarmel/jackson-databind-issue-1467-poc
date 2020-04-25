@@ -14,12 +14,12 @@ import static com.fasterxml.jackson.core.JsonToken.VALUE_TRUE;
 
 public final class InstanceDeserializeStandardValue<T> extends InstanceHavingUnmanagedDependencies<T> {
 
-  private final PropertyConfiguration<T> conf;
+  private final PropertyConfiguration<?, T> conf;
   private T data;
   private boolean isDone = false;
 
   public InstanceDeserializeStandardValue(
-    PropertyConfiguration<T> conf,
+    PropertyConfiguration<?, T> conf,
     List<DeserializationStepInstance<?>> dependencies
   ) {
     super(dependencies);

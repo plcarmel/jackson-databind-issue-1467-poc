@@ -17,4 +17,26 @@ public class BasicTest {
     assertSame(result.getClass(), Object.class);
   }
 
+  public static class CustomClass { }
+
+  @Test
+  public void customClassTest() throws IOException {
+    final String str = "{}";
+    final CustomClass result = new ObjectMapper().readValue(str, CustomClass.class);
+    assertNotNull(result);
+    assertSame(result.getClass(), CustomClass.class);
+  }
+
+  public static class ClassWithProperty {
+    int x;
+  }
+
+  @Test
+  public void fieldPropertyTest() throws IOException {
+    final String str = "{ \"x\": 3 }";
+    final ClassWithProperty result = new ObjectMapper().readValue(str, ClassWithProperty.class);
+    assertNotNull(result);
+    assertEquals(3, result.x);
+  }
+
 }

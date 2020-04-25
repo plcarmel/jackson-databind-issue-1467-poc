@@ -51,7 +51,7 @@ public final class InstanceAlso<T> extends InstanceHavingUnmanagedDependencies<T
 
   @Override
   public boolean isDone() {
-    return mainDependency == null && areDependenciesSatisfied();
+    return mainDependency == null && super.areDependenciesSatisfied();
   }
 
   @Override
