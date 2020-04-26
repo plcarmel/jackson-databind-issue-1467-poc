@@ -7,17 +7,18 @@ import com.plcarmel.jackson.databind1467poc.theory.NoData;
 import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;
 
 import java.util.List;
+import java.util.Map;
 
 public class StepSetProperty<TClass, TProperty> extends StepHavingUnmanagedDependencies<NoData> {
 
-  private final PropertyConfiguration<TClass, TProperty> propertyConfiguration;
+  private final PropertyConfiguration<TClass, ? extends TProperty> propertyConfiguration;
   private final DeserializationStep<TClass> instantiationStep;
-  private final DeserializationStep<TProperty> propertyDeserializationStep;
+  private final DeserializationStep<? extends TProperty> propertyDeserializationStep;
 
   public StepSetProperty(
-    PropertyConfiguration<TClass, TProperty> propertyConfiguration,
+    PropertyConfiguration<TClass, ? extends TProperty> propertyConfiguration,
     DeserializationStep<TClass> instantiationStep,
-    DeserializationStep<TProperty> propertyDeserializationStep,
+    DeserializationStep<? extends TProperty> propertyDeserializationStep,
     List<DeserializationStep<?>> otherDependencies
   ) {
     super(otherDependencies);
@@ -27,13 +28,20 @@ public class StepSetProperty<TClass, TProperty> extends StepHavingUnmanagedDepen
   }
 
   @Override
-  public DeserializationStepInstance<NoData> instantiated() {
-    return new InstanceSetProperty<>(
+  public DeserializationStepInstance<NoData> instantiated(
+    Map<DeserializationStep<?>, DeserializationStepInstance<?>> alreadyInstantiated
+  ) {
+    //noinspection unchecked
+    DeserializationStepInstance<NoData> instance = (DeserializationStepInstance<NoData>) alreadyInstantiated.get(this);
+    if (instance != null) return instance;
+    instance = new InstanceSetProperty<>(
       propertyConfiguration,
-      instantiationStep.instantiated(),
-      propertyDeserializationStep.instantiated(),
-      instantiatedDependencies()
+      instantiationStep.instantiated(alreadyInstantiated),
+      propertyDeserializationStep.instantiated(alreadyInstantiated),
+      instantiatedDependencies(alreadyInstantiated)
     );
+    alreadyInstantiated.put(this, instance);
+    return instance;
   }
 
 }

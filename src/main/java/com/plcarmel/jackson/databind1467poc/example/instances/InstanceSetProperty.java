@@ -1,31 +1,41 @@
 package com.plcarmel.jackson.databind1467poc.example.instances;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.plcarmel.jackson.databind1467poc.example.configuration.FieldPropertyConfiguration;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
-import static com.fasterxml.jackson.core.JsonToken.FIELD_NAME;
+import static java.util.stream.Collectors.toList;
 
 public class InstanceSetProperty<TClass, TProperty> extends InstanceNoData {
 
-  private final PropertyConfiguration<TClass, TProperty> propertyConfiguration;
+  private final PropertyConfiguration<TClass, ? extends TProperty> propertyConfiguration;
   private DeserializationStepInstance<TClass> instantiationStep;
-  private DeserializationStepInstance<TProperty> propertyDeserializationStepInstance;
+  private DeserializationStepInstance<? extends TProperty> propertyDeserializationStepInstance;
 
   public InstanceSetProperty(
-    PropertyConfiguration<TClass, TProperty> propertyConfiguration,
+    PropertyConfiguration<TClass, ? extends TProperty> propertyConfiguration,
     DeserializationStepInstance<TClass> instantiationStep,
-    DeserializationStepInstance<TProperty> propertyDeserializationStepInstance,
+    DeserializationStepInstance<? extends TProperty> propertyDeserializationStepInstance,
     List<DeserializationStepInstance<?>> otherDependencies
   ) {
     super(otherDependencies);
     this.propertyConfiguration = propertyConfiguration;
     this.instantiationStep = instantiationStep;
     this.propertyDeserializationStepInstance = propertyDeserializationStepInstance;
+    registerAsParent();
+  }
+
+  @Override
+  public List<DeserializationStepInstance<?>> getDependencies() {
+    return Stream.of(
+      super.getDependencies().stream(),
+      Stream.of(instantiationStep, propertyDeserializationStepInstance)
+    ).flatMap(s -> s) .collect(toList());
   }
 
   @Override
@@ -35,12 +45,7 @@ public class InstanceSetProperty<TClass, TProperty> extends InstanceNoData {
 
   @Override
   public boolean canHandleCurrentToken(JsonParser parser) {
-    try {
-      return parser.currentToken() == FIELD_NAME &&
-        parser.getText().equals(propertyConfiguration.getName());
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    return false;
   }
 
   @Override
@@ -62,15 +67,28 @@ public class InstanceSetProperty<TClass, TProperty> extends InstanceNoData {
 
   @Override
   public void prune(Consumer<DeserializationStepInstance<?>> onRemoved) {
-    super.prune(onRemoved);
-    if (instantiationStep.isDone()) {
+    if (
+      instantiationStep != null &&
+      propertyDeserializationStepInstance != null &&
+      instantiationStep.isDone() &&
+      propertyDeserializationStepInstance.isDone()
+    ) {
+      if (propertyConfiguration instanceof FieldPropertyConfiguration) {
+        //noinspection unchecked
+        FieldPropertyConfiguration<TClass, TProperty> fpc =
+          (FieldPropertyConfiguration<TClass, TProperty>) propertyConfiguration;
+        try {
+          fpc.getField().set(instantiationStep.getData(), propertyDeserializationStepInstance.getData());
+        } catch (IllegalAccessException e) {
+          throw new RuntimeException(e);
+        }
+      }
       onRemoved.accept(instantiationStep);
       instantiationStep = null;
-    }
-    if (propertyDeserializationStepInstance.isDone()) {
       onRemoved.accept(propertyDeserializationStepInstance);
       propertyDeserializationStepInstance = null;
     }
+    super.prune(onRemoved);
   }
 }
 

@@ -23,13 +23,15 @@ public class FieldPropertyConfiguration<TClass, TProperty> implements PropertyCo
     typeConfiguration =
       (TypeConfiguration<TProperty>) CachedTypeConfigurationFactory
         .getInstance()
-        .getTypeConfiguration(field.getDeclaringClass());
+        .getTypeConfiguration(field.getType());
   }
 
   @Override
   public String getName() {
     return field.getName();
   }
+
+  public Field getField() { return field; }
 
   @Override
   public Class<TClass> getDeclaringClass() {

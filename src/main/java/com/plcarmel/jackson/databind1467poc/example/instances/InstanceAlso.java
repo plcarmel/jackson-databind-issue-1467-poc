@@ -56,7 +56,7 @@ public final class InstanceAlso<T> extends InstanceHavingUnmanagedDependencies<T
 
   @Override
   public void prune(Consumer<DeserializationStepInstance<?>> onRemoved) {
-    if ( mainDependency != null && mainDependency.isDone()) {
+    if (mainDependency != null && mainDependency.isDone()) {
       data = mainDependency.getData();
       mainDependency.removeParent(this);
       onRemoved.accept(mainDependency);

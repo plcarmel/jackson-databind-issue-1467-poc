@@ -27,14 +27,14 @@ public class BasicTest {
     assertSame(result.getClass(), CustomClass.class);
   }
 
-  public static class ClassWithProperty {
-    int x;
+  public static class ClassWithPublicProperty {
+    public int x;
   }
 
   @Test
   public void fieldPropertyTest() throws IOException {
     final String str = "{ \"x\": 3 }";
-    final ClassWithProperty result = new ObjectMapper().readValue(str, ClassWithProperty.class);
+    final ClassWithPublicProperty result = new ObjectMapper().readValue(str, ClassWithPublicProperty.class);
     assertNotNull(result);
     assertEquals(3, result.x);
   }

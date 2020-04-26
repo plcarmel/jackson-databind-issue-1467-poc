@@ -37,7 +37,7 @@ public final class InstanceDeserializeStandardValue<T> extends InstanceHavingUnm
     // Of course, this would be replaced with the current implementation of jackson-databind, which is much
     // more sophisticated than this. We are not supporting dates, among other things.
     final JsonParseException notTheAppropriateType = new JsonParseException(parser, "Not the appropriate type.");
-    final JsonToken currentToken = parser.currentToken();
+    final JsonToken currentToken = parser.getCurrentToken();
     final Class<T> typeClass = conf.getTypeConfiguration().getTypeClass();
     switch (currentToken) {
       case NOT_AVAILABLE:
@@ -53,6 +53,7 @@ public final class InstanceDeserializeStandardValue<T> extends InstanceHavingUnm
         if (typeClass != Boolean.class) throw notTheAppropriateType;
         //noinspection unchecked
         data = (T) (currentToken == VALUE_TRUE ? Boolean.TRUE : Boolean.FALSE);
+        break;
       case VALUE_NUMBER_FLOAT:
       case VALUE_NUMBER_INT:
       case VALUE_STRING:
@@ -62,6 +63,7 @@ public final class InstanceDeserializeStandardValue<T> extends InstanceHavingUnm
         data = (T) SupportedTypes.typeToValueParser.get(typeClass).apply(parser);
         isDone = true;
         parser.nextToken();
+        break;
       default:
         throw new JsonParseException(parser, "Unexpected token " + parser.getCurrentToken());
     }
@@ -74,7 +76,7 @@ public final class InstanceDeserializeStandardValue<T> extends InstanceHavingUnm
 
   @Override
   public boolean isDone() {
-    return isDone;
+    return isDone && super.areDependenciesSatisfied();
   }
 
   @Override

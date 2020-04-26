@@ -3,6 +3,7 @@ package com.plcarmel.jackson.databind1467poc.theory;
 import com.fasterxml.jackson.core.JsonParser;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.plcarmel.jackson.databind1467poc.Utils.topologicalSort;
@@ -33,10 +34,10 @@ public class Interpreter<T> implements AsynchronousDeserialization<T> {
         .stream()
         .filter(d -> d.canHandleCurrentToken(parser))
         .findFirst()
-        .orElseThrow(() -> new IllegalStateException("No step can handle current token"));
+        .orElseThrow(() -> new IllegalStateException("No step can handle current token " + parser.getCurrentToken()));
     step.pushToken(parser);
     if (step.isDone()) {
-      step.getParents().forEach(p -> p.prune(startToFinish::remove));
+      new ArrayList<>(step.getParents()).forEach(p -> p.prune(startToFinish::remove));
     }
   }
 

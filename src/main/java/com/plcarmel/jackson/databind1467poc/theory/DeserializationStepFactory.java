@@ -21,20 +21,20 @@ public interface DeserializationStepFactory {
   <T> DeserializationStepBuilder<T> builderDeserializeArray(TypeConfiguration<T> conf);
 
   <TClass, TProperty> DeserializationStepBuilder<NoData> builderSetProperty(
-    PropertyConfiguration<TClass, TProperty> conf,
+    PropertyConfiguration<TClass, ? extends TProperty> conf,
     DeserializationStep<TClass> instantiationStep,
-    DeserializationStep<TProperty> valueDeserializationStep
+    DeserializationStep<? extends TProperty> valueDeserializationStep
   );
 
-  default <TClass, TProperty> DeserializationStepBuilder<TProperty> builderDeserializeProperty(
-    PropertyConfiguration<TClass, TProperty> conf
+  default <TProperty> DeserializationStepBuilder<TProperty> builderDeserializeProperty(
+    PropertyConfiguration<?, TProperty> conf
   ) {
     final DeserializationStepBuilder<TProperty> builder = builderDeserializeValue(conf);
     builder.addDependency(builderExpectToken(FIELD_NAME, conf.getName()).build());
     return builder;
   }
 
-  default <T> DeserializationStepBuilder<T> builderDeserializeValue(PropertyConfiguration<T> conf) {
+  default <T> DeserializationStepBuilder<T> builderDeserializeValue(PropertyConfiguration<?, T> conf) {
     if (conf.getTypeConfiguration().isStandardType()) {
       return builderDeserializeStandardType(conf);
     }
@@ -50,15 +50,14 @@ public interface DeserializationStepFactory {
       ? builderInstantiateUsing(conf.getCreatorConfiguration())
       : builderInstantiateUsingDefaultConstructor(conf);
     builderStepInstantiate.addDependency(builderExpectTokenKind(START_OBJECT).build());
-    final DeserializationStepBuilder<T> builderStepWriteProperties =
-      builderStepAlso(builderStepInstantiate.build());
+    DeserializationStep<T> stepInstantiate = builderStepInstantiate.build();
+    final DeserializationStepBuilder<T> builderRoot = builderStepAlso(stepInstantiate);
     conf
       .getProperties()
       .stream()
-      .map(this::builderDeserializeProperty)
+      .map(c -> this.builderSetProperty(c, stepInstantiate, builderDeserializeProperty(c).build()))
       .map(DeserializationStepBuilder::build)
-      .forEach(builderStepWriteProperties::addDependency);
-    final DeserializationStepBuilder<T> builderRoot = builderStepAlso(builderStepWriteProperties.build());
+      .forEach(builderRoot::addDependency);
     builderRoot.addDependency(builderExpectTokenKind(END_OBJECT).build());
     return builderRoot;
   }

@@ -38,12 +38,17 @@ public final class InstanceExpectToken extends InstanceNoData {
     this.expectedTokenKind = expectedTokenKind;
     this.expectedTokenValue = null;
     useTokenValue = false;
+    this.registerAsParent();
   }
 
   @Override
   public boolean canHandleCurrentToken(JsonParser parser) {
-    return parser.currentToken() == expectedTokenKind &&
-      (!useTokenValue || parser.getCurrentValue().equals(expectedTokenValue));
+    try {
+      return parser.currentToken() == expectedTokenKind &&
+        (!useTokenValue || parser.getCurrentName().equals(expectedTokenValue));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override

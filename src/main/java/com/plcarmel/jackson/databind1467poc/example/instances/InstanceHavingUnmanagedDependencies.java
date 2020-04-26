@@ -2,6 +2,7 @@ package com.plcarmel.jackson.databind1467poc.example.instances;
 
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -34,7 +35,7 @@ public abstract class InstanceHavingUnmanagedDependencies<T> extends InstanceBas
       else i++;
     }
     if (isDone()) {
-      getParents().forEach(p -> p.prune(onRemoved));
+      new ArrayList<>(getParents()).forEach(p -> p.prune(onRemoved));
     }
   }
 }
