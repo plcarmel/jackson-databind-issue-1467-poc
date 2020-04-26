@@ -27,16 +27,30 @@ public class BasicTest {
     assertSame(result.getClass(), CustomClass.class);
   }
 
-  public static class ClassWithPublicProperty {
+  public static class ClassWithPublicFieldStandardProperty {
     public int x;
   }
 
   @Test
-  public void fieldPropertyTest() throws IOException {
-    final String str = "{ \"x\": 3 }";
-    final ClassWithPublicProperty result = new ObjectMapper().readValue(str, ClassWithPublicProperty.class);
+  public void fieldPublicStandardPropertyTest() throws IOException {
+    final String str = "{ \"x\": 1234 }";
+    final ClassWithPublicFieldStandardProperty result =
+      new ObjectMapper().readValue(str, ClassWithPublicFieldStandardProperty.class);
     assertNotNull(result);
-    assertEquals(3, result.x);
+    assertEquals(1234, result.x);
+  }
+
+  public static class ClassWithPublicFieldNonStandardProperty {
+    public ClassWithPublicFieldStandardProperty x;
+  }
+
+  @Test
+  public void fieldPublicNonStandardPropertyTest() throws IOException {
+    final String str = "{ \"x\": { \"x\": 1234 } }";
+    final ClassWithPublicFieldNonStandardProperty result =
+      new ObjectMapper().readValue(str, ClassWithPublicFieldNonStandardProperty.class);
+    assertNotNull(result);
+    assertEquals(1234, result.x.x);
   }
 
 }
