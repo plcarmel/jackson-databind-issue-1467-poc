@@ -1,5 +1,6 @@
 package com.plcarmel.jackson.databind1467poc;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.plcarmel.jackson.databind1467poc.example.ObjectMapper;
 import org.junit.Test;
 
@@ -51,6 +52,20 @@ public class BasicTest {
       new ObjectMapper().readValue(str, ClassWithPublicFieldNonStandardProperty.class);
     assertNotNull(result);
     assertEquals(1234, result.x.x);
+  }
+
+  public static class ClassWithUnwrappedPublicFieldProperty {
+    @JsonUnwrapped
+    public ClassWithPublicFieldStandardProperty y;
+  }
+
+  @Test
+  public void unwrappedPublicFieldPropertyTest() throws IOException {
+    final String str = "{ \"x\": 1234 }";
+    final ClassWithUnwrappedPublicFieldProperty result =
+      new ObjectMapper().readValue(str, ClassWithUnwrappedPublicFieldProperty.class);
+    assertNotNull(result);
+    assertEquals(result.y.x, 1234);
   }
 
 }
