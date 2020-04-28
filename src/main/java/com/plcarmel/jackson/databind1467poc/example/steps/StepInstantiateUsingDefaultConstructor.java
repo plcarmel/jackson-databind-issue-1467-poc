@@ -1,14 +1,17 @@
 package com.plcarmel.jackson.databind1467poc.example.steps;
 
 import com.plcarmel.jackson.databind1467poc.example.instances.InstanceInstantiateUsingDefaultConstructor;
+import com.plcarmel.jackson.databind1467poc.example.structures.StructureUnmanaged;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStep;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.TypeConfiguration;
 
 import java.util.List;
 
-public class StepInstantiateUsingDefaultConstructor<T> extends StepHavingUnmanagedDependencies<T> {
-
+public class StepInstantiateUsingDefaultConstructor<T>
+  extends StructureUnmanaged<DeserializationStep<?>>
+  implements StepUnmanagedMixin<T>
+{
   private final TypeConfiguration<T> conf;
 
   public StepInstantiateUsingDefaultConstructor(TypeConfiguration<T> conf, List<DeserializationStep<?>> dependencies) {
@@ -22,5 +25,10 @@ public class StepInstantiateUsingDefaultConstructor<T> extends StepHavingUnmanag
       conf,
       instantiatedDependencies(dependenciesInstanceFactory)
     );
+  }
+
+  @Override
+  public StructureUnmanaged<DeserializationStep<?>> thisAsStructureUnmanaged() {
+    return this;
   }
 }

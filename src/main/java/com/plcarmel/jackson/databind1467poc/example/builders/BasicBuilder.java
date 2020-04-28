@@ -15,7 +15,7 @@ public class BasicBuilder<T> extends BuilderHavingUnmanagedDependencies<T> {
 
   @Override
   public DeserializationStep<T> build() {
-    return stepConstructor.apply(getDependencies());
+    return stepConstructor.apply(getUnmanagedDependencies());
   }
 
 }

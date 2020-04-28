@@ -26,6 +26,6 @@ public abstract class InstanceBase<T> implements DeserializationStepInstance<T> 
 
   @Override
   public void complete() {
-    getDependencies().forEach(DeserializationStepInstance::complete);
+    getUnmanagedDependencies().forEach(DeserializationStepInstance::complete);
   }
 }

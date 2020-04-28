@@ -14,7 +14,7 @@ public abstract class InstanceHavingUnmanagedDependencies<T> extends InstanceBas
     this.dependencies = dependencies;
   }
 
-  public List<DeserializationStepInstance<?>> getDependencies() {
+  public List<DeserializationStepInstance<?>> getUnmanagedDependencies() {
     return dependencies;
   }
 

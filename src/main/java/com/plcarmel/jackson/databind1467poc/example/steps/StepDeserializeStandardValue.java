@@ -1,14 +1,17 @@
 package com.plcarmel.jackson.databind1467poc.example.steps;
 
 import com.plcarmel.jackson.databind1467poc.example.instances.InstanceDeserializeStandardValue;
+import com.plcarmel.jackson.databind1467poc.example.structures.StructureUnmanaged;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStep;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;
 
 import java.util.List;
 
-public class StepDeserializeStandardValue<T> extends StepHavingUnmanagedDependencies<T> {
-
+public class StepDeserializeStandardValue<T>
+  extends StructureUnmanaged<DeserializationStep<?>>
+  implements StepUnmanagedMixin<T>
+{
   private final PropertyConfiguration<T> conf;
 
   public StepDeserializeStandardValue(
@@ -20,8 +23,12 @@ public class StepDeserializeStandardValue<T> extends StepHavingUnmanagedDependen
   }
 
   @Override
-  public DeserializationStepInstance<T> instantiated(InstanceFactory dependenciesInstanceFactory) {
+  public DeserializationStepInstance<T> instantiated(DeserializationStep.InstanceFactory dependenciesInstanceFactory) {
     return new InstanceDeserializeStandardValue<>(conf, instantiatedDependencies(dependenciesInstanceFactory));
   }
 
+  @Override
+  public StructureUnmanaged<DeserializationStep<?>> thisAsStructureUnmanaged() {
+    return this;
+  }
 }

@@ -68,7 +68,7 @@ public final class InstanceExpectToken extends InstanceNoData {
   }
 
   @Override
-  public List<DeserializationStepInstance<?>> getDependencies() {
+  public List<DeserializationStepInstance<?>> getUnmanagedDependencies() {
     return emptyList();
   }
 

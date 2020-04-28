@@ -16,7 +16,7 @@ public abstract class BuilderHavingUnmanagedDependencies<T> implements Deseriali
   }
 
   @Override
-  public List<DeserializationStep<?>> getDependencies() {
+  public List<DeserializationStep<?>> getUnmanagedDependencies() {
     return dependencies;
   }
 }

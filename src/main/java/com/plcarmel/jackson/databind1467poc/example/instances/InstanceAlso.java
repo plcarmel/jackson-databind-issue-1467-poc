@@ -65,9 +65,9 @@ public final class InstanceAlso<T> extends InstanceHavingUnmanagedDependencies<T
   }
 
   @Override
-  public List<DeserializationStepInstance<?>> getDependencies() {
+  public List<DeserializationStepInstance<?>> getUnmanagedDependencies() {
     Stream<DeserializationStepInstance<?>> s1 = mainDependency != null ? Stream.of(mainDependency) : Stream.empty();
-    Stream<DeserializationStepInstance<?>> s2 = super.getDependencies().stream();
+    Stream<DeserializationStepInstance<?>> s2 = super.getUnmanagedDependencies().stream();
     return Stream.of(s1, s2).flatMap(l -> l).collect(toList());
   }
 }

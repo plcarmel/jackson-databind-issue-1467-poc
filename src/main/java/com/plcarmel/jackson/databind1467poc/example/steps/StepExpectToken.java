@@ -2,13 +2,17 @@ package com.plcarmel.jackson.databind1467poc.example.steps;
 
 import com.fasterxml.jackson.core.JsonToken;
 import com.plcarmel.jackson.databind1467poc.example.instances.InstanceExpectToken;
+import com.plcarmel.jackson.databind1467poc.example.structures.StructureUnmanaged;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStep;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.NoData;
 
 import java.util.List;
 
-public class StepExpectToken extends StepHavingUnmanagedDependencies<NoData> {
+public class StepExpectToken
+  extends StructureUnmanaged<DeserializationStep<?>>
+  implements StepUnmanagedMixin<NoData>
+{
 
   private final JsonToken expectedTokenKind;
   private final Object expectedTokenValue;
@@ -47,5 +51,10 @@ public class StepExpectToken extends StepHavingUnmanagedDependencies<NoData> {
         expectedTokenKind,
         instantiatedDependencies(dependenciesInstanceFactory)
       );
+  }
+
+  @Override
+  public StructureUnmanaged<DeserializationStep<?>> thisAsStructureUnmanaged() {
+    return this;
   }
 }
