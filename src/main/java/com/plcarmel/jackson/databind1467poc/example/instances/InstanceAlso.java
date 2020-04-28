@@ -20,7 +20,6 @@ public final class InstanceAlso<T> extends InstanceHavingUnmanagedDependencies<T
   ) {
     super(otherDependencies);
     this.mainDependency = mainDependency;
-    this.registerAsParent();
   }
 
   @Override

@@ -27,7 +27,6 @@ public final class InstanceExpectToken extends InstanceNoData {
     this.expectedTokenKind = expectedTokenKind;
     this.expectedTokenValue = expectedTokenValue;
     useTokenValue = true;
-    this.registerAsParent();
   }
 
   public InstanceExpectToken(
@@ -38,7 +37,6 @@ public final class InstanceExpectToken extends InstanceNoData {
     this.expectedTokenKind = expectedTokenKind;
     this.expectedTokenValue = null;
     useTokenValue = false;
-    this.registerAsParent();
   }
 
   @Override

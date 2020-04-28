@@ -18,7 +18,6 @@ public final class InstanceInstantiateUsingDefaultConstructor<T> extends Instanc
   ) {
     super(dependencies);
     typeClass = typeConfiguration.getTypeClass();
-    this.registerAsParent();
   }
 
   @Override

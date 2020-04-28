@@ -24,7 +24,6 @@ public final class InstanceDeserializeStandardValue<T> extends InstanceHavingUnm
   ) {
     super(dependencies);
     this.conf = conf;
-    this.registerAsParent();
   }
 
   @Override

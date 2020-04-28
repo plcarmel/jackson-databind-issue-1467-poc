@@ -16,9 +16,10 @@ public class Interpreter<T> implements AsynchronousDeserialization<T> {
   private final List<DeserializationStepInstance<?>> startToFinish;
   private final DeserializationStepInstance<T> finalStep;
 
-  public Interpreter(DeserializationStepInstance<T> finalStep) {
-    this.finalStep = finalStep;
-    startToFinish = topologicalSort(finalStep, HasDependencies::getDependencies);
+  public Interpreter(DeserializationStep<T> finalStep) {
+    this.finalStep = finalStep.instantiated();
+    this.finalStep.setTreeParents();
+    startToFinish = topologicalSort(this.finalStep, HasDependencies::getDependencies);
   }
 
   @Override

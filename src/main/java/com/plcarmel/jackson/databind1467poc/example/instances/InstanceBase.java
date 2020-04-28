@@ -9,10 +9,6 @@ public abstract class InstanceBase<T> implements DeserializationStepInstance<T> 
 
   private final Set<DeserializationStepInstance<?>> parents = new HashSet<>();
 
-  protected void registerAsParent() {
-    getDependencies().forEach(d -> d.addParent(this));
-  }
-
   @Override
   public Set<DeserializationStepInstance<?>> getParents() {
     return parents;

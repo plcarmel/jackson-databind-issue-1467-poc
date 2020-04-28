@@ -27,7 +27,6 @@ public class InstanceSetProperty<TClass, TProperty> extends InstanceNoData {
     this.propertyConfiguration = propertyConfiguration;
     this.instantiationStep = instantiationStep;
     this.propertyDeserializationStepInstance = propertyDeserializationStepInstance;
-    registerAsParent();
   }
 
   @Override

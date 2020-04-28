@@ -1,5 +1,6 @@
 package com.plcarmel.jackson.databind1467poc.theory;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public interface DeserializationStep<T> extends HasDependencies<DeserializationStep<?>> {
@@ -27,6 +28,10 @@ public interface DeserializationStep<T> extends HasDependencies<DeserializationS
       );
     alreadyInstantiated.put(this, instance);
     return instance;
+  }
+
+  default DeserializationStepInstance<T> instantiated() {
+    return instantiated(new HashMap<>());
   }
 
 }
