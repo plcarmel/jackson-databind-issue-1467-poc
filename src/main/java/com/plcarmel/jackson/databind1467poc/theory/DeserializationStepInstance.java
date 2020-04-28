@@ -23,7 +23,7 @@ public interface DeserializationStepInstance<T>
 
   default void setTreeParents(Set<DeserializationStepInstance<?>> alreadyVisited) {
     if (alreadyVisited.contains(this)) return;
-    final List<DeserializationStepInstance<?>> dependencies = this.getUnmanagedDependencies();
+    final List<DeserializationStepInstance<?>> dependencies = this.getDependencies();
     dependencies.forEach(d -> d.addParent(this));
     dependencies.forEach(d -> d.setTreeParents(alreadyVisited));
   }

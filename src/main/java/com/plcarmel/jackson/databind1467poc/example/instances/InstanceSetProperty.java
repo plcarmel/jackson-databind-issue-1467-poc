@@ -30,9 +30,9 @@ public class InstanceSetProperty<TClass, TProperty> extends InstanceNoData {
   }
 
   @Override
-  public List<DeserializationStepInstance<?>> getUnmanagedDependencies() {
+  public List<DeserializationStepInstance<?>> getDependencies() {
     return Stream.of(
-      super.getUnmanagedDependencies().stream(),
+      super.getDependencies().stream(),
       Stream.of(instantiationStep, propertyDeserializationStepInstance)
     ).flatMap(s -> s) .collect(toList());
   }

@@ -25,11 +25,11 @@ public class StructureSetProperty<
   }
 
   @Override
-  public List<TDep> getUnmanagedDependencies() {
+  public List<TDep> getDependencies() {
     final List<TDep> result = new ArrayList<>();
     result.add(instantiationStep);
     result.add(deserializationStep);
-    result.addAll(super.getUnmanagedDependencies());
+    result.addAll(super.getDependencies());
     return result;
   }
 }

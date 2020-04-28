@@ -13,7 +13,7 @@ public class StructureUnmanaged<T extends HasDependencies<T>> implements HasDepe
   }
 
   @Override
-  public List<T> getUnmanagedDependencies() {
+  public List<T> getDependencies() {
     return unmanagedDependencies;
   }
 }

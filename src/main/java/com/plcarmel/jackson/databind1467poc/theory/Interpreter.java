@@ -19,10 +19,10 @@ public class Interpreter<T> implements AsynchronousDeserialization<T> {
   public Interpreter(DeserializationStep<T> finalStep) {
     this.finalStep = finalStep.instantiated();
     this.finalStep.setTreeParents();
-    startToFinish = topologicalSort(this.finalStep, HasDependencies::getUnmanagedDependencies);
+    startToFinish = topologicalSort(this.finalStep, HasDependencies::getDependencies);
     new ArrayList<>(startToFinish)
       .stream()
-      .filter(d -> d.getUnmanagedDependencies().isEmpty())
+      .filter(d -> d.getDependencies().isEmpty())
       .forEach(d -> d.prune(startToFinish::remove));
   }
 

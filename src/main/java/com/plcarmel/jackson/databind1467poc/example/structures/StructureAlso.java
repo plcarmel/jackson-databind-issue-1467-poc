@@ -16,7 +16,7 @@ public class StructureAlso<TMain extends TDep, TDep extends HasDependencies<TDep
   }
 
   @Override
-  public List<TDep> getUnmanagedDependencies() {
+  public List<TDep> getDependencies() {
     final List<TDep> result = new ArrayList<>();
     result.add(mainDependency);
     result.addAll(super.unmanagedDependencies);
