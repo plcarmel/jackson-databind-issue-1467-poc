@@ -19,7 +19,7 @@ public class SimpleDeserializationStepFactory implements DeserializationStepFact
   }
 
   @Override
-  public <T> DeserializationStepBuilder<T> builderDeserializeStandardType(PropertyConfiguration<?, T> conf) {
+  public <T> DeserializationStepBuilder<T> builderDeserializeStandardType(PropertyConfiguration<T> conf) {
     return new BasicBuilder<>(l -> new StepDeserializeStandardValue<>(conf, l));
   }
 
@@ -53,7 +53,7 @@ public class SimpleDeserializationStepFactory implements DeserializationStepFact
 
   @Override
   public <TClass, TProperty> DeserializationStepBuilder<NoData> builderSetProperty(
-    PropertyConfiguration<TClass, ? extends TProperty> conf,
+    PropertyConfiguration<? extends TProperty> conf,
     DeserializationStep<TClass> instantiationStep,
     DeserializationStep<? extends TProperty> valueDeserializationStep
   ) {

@@ -9,10 +9,10 @@ import java.util.List;
 
 public class StepDeserializeStandardValue<T> extends StepHavingUnmanagedDependencies<T> {
 
-  private final PropertyConfiguration<?, T> conf;
+  private final PropertyConfiguration<T> conf;
 
   public StepDeserializeStandardValue(
-    PropertyConfiguration<?, T> conf,
+    PropertyConfiguration<T> conf,
     List<DeserializationStep<?>> dependencies
   ) {
     super(dependencies);

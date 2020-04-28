@@ -13,12 +13,12 @@ import static java.util.stream.Collectors.toList;
 
 public class InstanceSetProperty<TClass, TProperty> extends InstanceNoData {
 
-  private final PropertyConfiguration<TClass, ? extends TProperty> propertyConfiguration;
+  private final PropertyConfiguration<? extends TProperty> propertyConfiguration;
   private DeserializationStepInstance<TClass> instantiationStep;
   private DeserializationStepInstance<? extends TProperty> propertyDeserializationStepInstance;
 
   public InstanceSetProperty(
-    PropertyConfiguration<TClass, ? extends TProperty> propertyConfiguration,
+    PropertyConfiguration<? extends TProperty> propertyConfiguration,
     DeserializationStepInstance<TClass> instantiationStep,
     DeserializationStepInstance<? extends TProperty> propertyDeserializationStepInstance,
     List<DeserializationStepInstance<?>> otherDependencies

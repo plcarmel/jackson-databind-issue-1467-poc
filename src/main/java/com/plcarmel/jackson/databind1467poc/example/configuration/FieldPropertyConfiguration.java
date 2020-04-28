@@ -1,13 +1,14 @@
 package com.plcarmel.jackson.databind1467poc.example.configuration;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;
 import com.plcarmel.jackson.databind1467poc.theory.TypeConfiguration;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
-public class FieldPropertyConfiguration<TClass, TProperty> implements PropertyConfiguration<TClass, TProperty> {
+public class FieldPropertyConfiguration<TClass, TProperty> implements PropertyConfiguration<TProperty> {
 
   private final Field field;
   private final TypeConfiguration<TProperty> typeConfiguration;
@@ -34,12 +35,6 @@ public class FieldPropertyConfiguration<TClass, TProperty> implements PropertyCo
   public Field getField() { return field; }
 
   @Override
-  public Class<TClass> getDeclaringClass() {
-    //noinspection unchecked
-    return (Class<TClass>) field.getDeclaringClass();
-  }
-
-  @Override
   public TypeConfiguration<TProperty> getTypeConfiguration() {
     return typeConfiguration;
   }
@@ -47,5 +42,10 @@ public class FieldPropertyConfiguration<TClass, TProperty> implements PropertyCo
   @Override
   public boolean isRequired() {
     return isRequired;
+  }
+
+  @Override
+  public boolean isUnwrapped() {
+    return field.getAnnotationsByType(JsonUnwrapped.class).length != 0;
   }
 }

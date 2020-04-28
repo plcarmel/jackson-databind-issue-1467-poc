@@ -2,7 +2,6 @@ package com.plcarmel.jackson.databind1467poc;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.plcarmel.jackson.databind1467poc.example.ObjectMapper;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -61,7 +60,6 @@ public class BasicTest {
   }
 
   @Test
-  @Ignore
   public void unwrappedPublicFieldPropertyTest() throws IOException {
     final String str = "{ \"x\": 1234 }";
     final ClassWithUnwrappedPublicFieldProperty result =

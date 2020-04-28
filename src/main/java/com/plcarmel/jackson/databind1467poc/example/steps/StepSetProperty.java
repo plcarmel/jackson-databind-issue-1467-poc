@@ -10,12 +10,12 @@ import java.util.List;
 
 public class StepSetProperty<TClass, TProperty> extends StepHavingUnmanagedDependencies<NoData> {
 
-  private final PropertyConfiguration<TClass, ? extends TProperty> propertyConfiguration;
+  private final PropertyConfiguration<? extends TProperty> propertyConfiguration;
   private final DeserializationStep<TClass> instantiationStep;
   private final DeserializationStep<? extends TProperty> propertyDeserializationStep;
 
   public StepSetProperty(
-    PropertyConfiguration<TClass, ? extends TProperty> propertyConfiguration,
+    PropertyConfiguration<? extends TProperty> propertyConfiguration,
     DeserializationStep<TClass> instantiationStep,
     DeserializationStep<? extends TProperty> propertyDeserializationStep,
     List<DeserializationStep<?>> otherDependencies

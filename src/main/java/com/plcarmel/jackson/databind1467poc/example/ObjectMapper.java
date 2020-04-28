@@ -14,7 +14,7 @@ public class ObjectMapper {
     final DeserializationStepBuilder<T> builder =
       SimpleDeserializationStepFactory
         .getInstance()
-        .builderDeserializeValue(CachedTypeConfigurationFactory.getInstance().getTypeConfiguration(valueType));
+        .builderDeserializeBeanValue(CachedTypeConfigurationFactory.getInstance().getTypeConfiguration(valueType));
     final Interpreter<T> interpreter = new Interpreter<>(builder.build());
     final JsonParser parser = JsonFactory.builder().build().createParser(content);
     parser.nextToken();

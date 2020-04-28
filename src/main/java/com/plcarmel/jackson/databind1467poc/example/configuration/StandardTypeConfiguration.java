@@ -36,7 +36,7 @@ public class StandardTypeConfiguration<T> implements TypeConfiguration<T> {
   }
 
   @Override
-  public Collection<PropertyConfiguration<T, ?>> getProperties() {
+  public Collection<PropertyConfiguration<?>> getProperties() {
     return Collections.emptyList();
   }
 

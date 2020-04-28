@@ -8,7 +8,7 @@ public interface DeserializationStepFactory {
 
   <T> DeserializationStepBuilder<T> builderStepAlso(DeserializationStep<T> mainDependency);
 
-  <T> DeserializationStepBuilder<T> builderDeserializeStandardType(PropertyConfiguration<?, T> conf);
+  <T> DeserializationStepBuilder<T> builderDeserializeStandardType(PropertyConfiguration<T> conf);
 
   <T> DeserializationStepBuilder<T> builderInstantiateUsingDefaultConstructor(TypeConfiguration<T> conf);
 
@@ -21,45 +21,58 @@ public interface DeserializationStepFactory {
   <T> DeserializationStepBuilder<T> builderDeserializeArray(TypeConfiguration<T> conf);
 
   <TClass, TProperty> DeserializationStepBuilder<NoData> builderSetProperty(
-    PropertyConfiguration<TClass, ? extends TProperty> conf,
+    PropertyConfiguration<? extends TProperty> conf,
     DeserializationStep<TClass> instantiationStep,
     DeserializationStep<? extends TProperty> valueDeserializationStep
   );
 
   default <TProperty> DeserializationStepBuilder<TProperty> builderDeserializeProperty(
-    PropertyConfiguration<?, TProperty> conf
+    PropertyConfiguration<TProperty> conf
   ) {
     final DeserializationStepBuilder<TProperty> builder = builderDeserializeValue(conf);
-    builder.addDependency(builderExpectToken(FIELD_NAME, conf.getName()).build());
+    if (!conf.isUnwrapped()) {
+      builder.addDependency(builderExpectToken(FIELD_NAME, conf.getName()).build());
+    }
     return builder;
   }
 
-  default <T> DeserializationStepBuilder<T> builderDeserializeValue(PropertyConfiguration<?, T> conf) {
+  default <T> DeserializationStepBuilder<T> builderDeserializeValue(PropertyConfiguration<T> conf) {
     if (conf.getTypeConfiguration().isStandardType()) {
       return builderDeserializeStandardType(conf);
     }
-    return builderDeserializeValue(conf.getTypeConfiguration());
+    final TypeConfiguration<T> typeConf = conf.getTypeConfiguration();
+    if (typeConf.isCollection()) {
+      return builderDeserializeArray(typeConf);
+    }
+    return builderDeserializeBeanValue(typeConf, conf.isUnwrapped());
   }
 
-  default <T> DeserializationStepBuilder<T> builderDeserializeValue(TypeConfiguration<T> conf) {
-    if (conf.isCollection()) {
-      return builderDeserializeArray(conf);
-    }
+  default <T> DeserializationStepBuilder<T> builderDeserializeBeanValue(
+    TypeConfiguration<T> typeConf,
+    boolean unwrapped
+  ) {
     final DeserializationStepBuilder<T> builderStepInstantiate =
-      conf.hasCreator()
-      ? builderInstantiateUsing(conf.getCreatorConfiguration())
-      : builderInstantiateUsingDefaultConstructor(conf);
-    builderStepInstantiate.addDependency(builderExpectTokenKind(START_OBJECT).build());
+      typeConf.hasCreator()
+      ? builderInstantiateUsing(typeConf.getCreatorConfiguration())
+      : builderInstantiateUsingDefaultConstructor(typeConf);
+    if (!unwrapped) {
+      builderStepInstantiate.addDependency(builderExpectTokenKind(START_OBJECT).build());
+    }
     DeserializationStep<T> stepInstantiate = builderStepInstantiate.build();
     final DeserializationStepBuilder<T> builderRoot = builderStepAlso(stepInstantiate);
-    conf
+    typeConf
       .getProperties()
       .stream()
       .map(c -> this.builderSetProperty(c, stepInstantiate, builderDeserializeProperty(c).build()))
       .map(DeserializationStepBuilder::build)
       .forEach(builderRoot::addDependency);
-    builderRoot.addDependency(builderExpectTokenKind(END_OBJECT).build());
+    if (!unwrapped) {
+      builderRoot.addDependency(builderExpectTokenKind(END_OBJECT).build());
+    }
     return builderRoot;
   }
 
+  default <T> DeserializationStepBuilder<T> builderDeserializeBeanValue(TypeConfiguration<T> typeConf) {
+    return builderDeserializeBeanValue(typeConf, false);
+  }
 }
