@@ -7,7 +7,6 @@ import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.NoData;
 
 import java.util.List;
-import java.util.Map;
 
 public class StepExpectToken extends StepHavingUnmanagedDependencies<NoData> {
 
@@ -37,16 +36,16 @@ public class StepExpectToken extends StepHavingUnmanagedDependencies<NoData> {
   }
 
   @Override
-  public DeserializationStepInstance<NoData> instantiated(
-    Map<DeserializationStep<?>, DeserializationStepInstance<?>> alreadyInstantiated
-  ) {
-    //noinspection unchecked
-    DeserializationStepInstance<NoData> instance = (DeserializationStepInstance<NoData>) alreadyInstantiated.get(this);
-    if (instance != null) return instance;
-    instance = useTokenValue
-      ? new InstanceExpectToken(expectedTokenKind, expectedTokenValue, instantiatedDependencies(alreadyInstantiated))
-      : new InstanceExpectToken(expectedTokenKind, instantiatedDependencies(alreadyInstantiated));
-    alreadyInstantiated.put(this, instance);
-    return instance;
+  public DeserializationStepInstance<NoData> instantiated(InstanceFactory dependenciesInstanceFactory) {
+    return useTokenValue
+      ? new InstanceExpectToken(
+        expectedTokenKind,
+        expectedTokenValue,
+        instantiatedDependencies(dependenciesInstanceFactory)
+      )
+      : new InstanceExpectToken(
+        expectedTokenKind,
+        instantiatedDependencies(dependenciesInstanceFactory)
+      );
   }
 }

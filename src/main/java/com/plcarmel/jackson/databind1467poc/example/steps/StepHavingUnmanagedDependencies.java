@@ -4,7 +4,6 @@ import com.plcarmel.jackson.databind1467poc.theory.DeserializationStep;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
 
 import java.util.List;
-import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 
@@ -17,11 +16,11 @@ public abstract class StepHavingUnmanagedDependencies<T> implements Deserializat
   }
 
   protected final List<DeserializationStepInstance<?>> instantiatedDependencies(
-    Map<DeserializationStep<?>, DeserializationStepInstance<?>> alreadyInstantiated
+    InstanceFactory dependenciesInstanceFactory
   ) {
     return getDependencies()
       .stream()
-      .map((DeserializationStep<?> deserializationStep) -> deserializationStep.instantiated(alreadyInstantiated))
+      .map(dependenciesInstanceFactory::instantiate)
       .collect(toList());
   }
 

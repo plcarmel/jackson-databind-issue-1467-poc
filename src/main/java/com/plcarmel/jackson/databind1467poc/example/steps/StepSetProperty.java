@@ -7,7 +7,6 @@ import com.plcarmel.jackson.databind1467poc.theory.NoData;
 import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;
 
 import java.util.List;
-import java.util.Map;
 
 public class StepSetProperty<TClass, TProperty> extends StepHavingUnmanagedDependencies<NoData> {
 
@@ -28,20 +27,13 @@ public class StepSetProperty<TClass, TProperty> extends StepHavingUnmanagedDepen
   }
 
   @Override
-  public DeserializationStepInstance<NoData> instantiated(
-    Map<DeserializationStep<?>, DeserializationStepInstance<?>> alreadyInstantiated
-  ) {
-    //noinspection unchecked
-    DeserializationStepInstance<NoData> instance = (DeserializationStepInstance<NoData>) alreadyInstantiated.get(this);
-    if (instance != null) return instance;
-    instance = new InstanceSetProperty<>(
+  public DeserializationStepInstance<NoData> instantiated(InstanceFactory instanceFactory) {
+    return new InstanceSetProperty<>(
       propertyConfiguration,
-      instantiationStep.instantiated(alreadyInstantiated),
-      propertyDeserializationStep.instantiated(alreadyInstantiated),
-      instantiatedDependencies(alreadyInstantiated)
+      instanceFactory.instantiate(instantiationStep),
+      instanceFactory.instantiate(propertyDeserializationStep),
+      instantiatedDependencies(instanceFactory)
     );
-    alreadyInstantiated.put(this, instance);
-    return instance;
   }
 
 }
