@@ -9,7 +9,7 @@ public interface DeserializationStep<T> extends HasDependencies<DeserializationS
     <U> DeserializationStepInstance<U> instantiate(DeserializationStep<U> step);
   }
 
-  DeserializationStepInstance<T> instantiated(InstanceFactory dependenciesInstanceFactory);
+  DeserializationStepInstance<T> instantiated(InstanceFactory factory);
 
   default DeserializationStepInstance<T> instantiated(
     Map<DeserializationStep<?>, DeserializationStepInstance<?>> alreadyInstantiated

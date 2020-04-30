@@ -1,34 +1,33 @@
 package com.plcarmel.jackson.databind1467poc.example.steps;
 
+import com.plcarmel.jackson.databind1467poc.example.groups.DependencyGroups;
+import com.plcarmel.jackson.databind1467poc.example.groups.HasDependencyGroupsMixin;
+import com.plcarmel.jackson.databind1467poc.example.groups.StepGroupMany;
 import com.plcarmel.jackson.databind1467poc.example.instances.InstanceDeserializeStandardValue;
-import com.plcarmel.jackson.databind1467poc.example.structures.StructureUnmanaged;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStep;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 public class StepDeserializeStandardValue<T>
-  extends StructureUnmanaged<DeserializationStep<?>>
-  implements StepUnmanagedMixin<T>
+  implements DeserializationStep<T>, HasDependencyGroupsMixin<DeserializationStep<?>>
 {
   private final PropertyConfiguration<T> conf;
+  private final StepGroupMany unmanaged;
 
-  public StepDeserializeStandardValue(
-    PropertyConfiguration<T> conf,
-    List<DeserializationStep<?>> dependencies
-  ) {
-    super(dependencies);
+  public StepDeserializeStandardValue(PropertyConfiguration<T> conf, StepGroupMany unmanaged) {
     this.conf = conf;
+    this.unmanaged = unmanaged;
   }
 
   @Override
-  public DeserializationStepInstance<T> instantiated(DeserializationStep.InstanceFactory dependenciesInstanceFactory) {
-    return new InstanceDeserializeStandardValue<>(conf, instantiatedDependencies(dependenciesInstanceFactory));
+  public DeserializationStepInstance<T> instantiated(DeserializationStep.InstanceFactory factory) {
+    return new InstanceDeserializeStandardValue<>(conf, unmanaged.instantiated(factory));
   }
 
   @Override
-  public StructureUnmanaged<DeserializationStep<?>> thisAsStructureUnmanaged() {
-    return this;
+  public DependencyGroups<DeserializationStep<?>> getDependencyGroups() {
+    return new DependencyGroups<>(Stream.of(unmanaged));
   }
 }

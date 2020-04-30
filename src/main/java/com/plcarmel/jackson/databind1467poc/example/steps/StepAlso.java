@@ -1,32 +1,37 @@
 package com.plcarmel.jackson.databind1467poc.example.steps;
 
+import com.plcarmel.jackson.databind1467poc.example.groups.*;
 import com.plcarmel.jackson.databind1467poc.example.instances.InstanceAlso;
-import com.plcarmel.jackson.databind1467poc.example.structures.StructureAlso;
-import com.plcarmel.jackson.databind1467poc.example.structures.StructureUnmanaged;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStep;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
 
-import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class StepAlso<T>
-  extends StructureAlso<DeserializationStep<T>, DeserializationStep<?>>
-  implements StepUnmanagedMixin<T>
+  implements HasDependencyGroupsMixin<DeserializationStep<?>>, DeserializationStep<T>
 {
+  private final GroupOne<DeserializationStep<T>, DeserializationStep<?>> mainDependency;
+  private final StepGroupMany unmanaged;
 
-  public StepAlso(DeserializationStep<T> mainDependency, List<DeserializationStep<?>> unmanagedDependencies) {
-    super(mainDependency, unmanagedDependencies);
+  public StepAlso(
+    GroupOne<DeserializationStep<T>, DeserializationStep<?>> mainDependency,
+    StepGroupMany unmanaged
+  ) {
+    this.mainDependency = mainDependency;
+    this.unmanaged = unmanaged;
   }
 
   @Override
-  public DeserializationStepInstance<T> instantiated(InstanceFactory dependenciesInstanceFactory) {
+  public DeserializationStepInstance<T> instantiated(InstanceFactory factory) {
     return new InstanceAlso<>(
-      dependenciesInstanceFactory.instantiate(mainDependency),
-      instantiatedDependencies(dependenciesInstanceFactory)
+      factory.instantiate(mainDependency.getMain()),
+      unmanaged.instantiated(factory)
     );
   }
 
   @Override
-  public StructureUnmanaged<DeserializationStep<?>> thisAsStructureUnmanaged() {
-    return this;
+  public DependencyGroups<DeserializationStep<?>> getDependencyGroups() {
+    return new DependencyGroups<>(Stream.of(mainDependency, unmanaged));
   }
 }

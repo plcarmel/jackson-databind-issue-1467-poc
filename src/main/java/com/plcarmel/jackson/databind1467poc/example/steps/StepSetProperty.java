@@ -1,50 +1,47 @@
 package com.plcarmel.jackson.databind1467poc.example.steps;
 
+import com.plcarmel.jackson.databind1467poc.example.groups.*;
 import com.plcarmel.jackson.databind1467poc.example.instances.InstanceSetProperty;
-import com.plcarmel.jackson.databind1467poc.example.structures.StructureSetProperty;
-import com.plcarmel.jackson.databind1467poc.example.structures.StructureUnmanaged;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStep;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.NoData;
 import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 public class StepSetProperty<
   TClass,
   TProperty
-> extends
-  StructureSetProperty<
-    DeserializationStep<TClass>,
-    DeserializationStep<? extends TProperty>,
-    DeserializationStep<?>
-> implements
-  StepUnmanagedMixin<NoData>
+> implements DeserializationStep<NoData>, HasDependencyGroupsMixin<DeserializationStep<?>>
 {
-  PropertyConfiguration<? extends TProperty> propertyConfiguration;
+  private final PropertyConfiguration<? extends TProperty> propertyConfiguration;
+  private final StepGroupMany unmanaged;
+  private final GroupTwo<DeserializationStep<TClass>, DeserializationStep<? extends TProperty>, DeserializationStep<?>>
+    managed;
 
   public StepSetProperty(
     PropertyConfiguration<? extends TProperty> propertyConfiguration,
-    DeserializationStep<TClass> instantiationStep,
-    DeserializationStep<? extends TProperty> propertyDeserializationStep,
-    List<DeserializationStep<?>> otherDependencies
+    GroupTwo<DeserializationStep<TClass>, DeserializationStep<? extends TProperty>, DeserializationStep<?>>
+      managed,
+    StepGroupMany unmanaged
   ) {
-    super(instantiationStep, propertyDeserializationStep, otherDependencies);
     this.propertyConfiguration = propertyConfiguration;
+    this.managed = managed;
+    this.unmanaged = unmanaged;
   }
 
   @Override
-  public DeserializationStepInstance<NoData> instantiated(DeserializationStep.InstanceFactory instanceFactory) {
+  public DeserializationStepInstance<NoData> instantiated(DeserializationStep.InstanceFactory factory) {
     return new InstanceSetProperty<>(
       propertyConfiguration,
-      instanceFactory.instantiate(instantiationStep),
-      instanceFactory.instantiate(deserializationStep),
-      instantiatedDependencies(instanceFactory)
+      factory.instantiate(managed.getFirst()),
+      factory.instantiate(managed.getSecond()),
+      unmanaged.instantiated(factory)
     );
   }
 
   @Override
-  public StructureUnmanaged<DeserializationStep<?>> thisAsStructureUnmanaged() {
-    return this;
+  public DependencyGroups<DeserializationStep<?>> getDependencyGroups() {
+    return new DependencyGroups<>(Stream.of(managed, unmanaged));
   }
 }
