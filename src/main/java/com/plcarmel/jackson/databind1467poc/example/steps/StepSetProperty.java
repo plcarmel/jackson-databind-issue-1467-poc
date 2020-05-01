@@ -9,20 +9,16 @@ import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;
 
 import java.util.stream.Stream;
 
-public class StepSetProperty<
-  TClass,
-  TProperty
-> implements DeserializationStep<NoData>, HasDependencyGroupsMixin<DeserializationStep<?>>
+public class StepSetProperty<TClass, TProperty>
+  implements DeserializationStep<NoData>, HasDependencyGroupsMixin<DeserializationStep<?>>
 {
   private final PropertyConfiguration<? extends TProperty> propertyConfiguration;
+  private final StepGroupTwo<TClass, ? extends TProperty> managed;
   private final StepGroupMany unmanaged;
-  private final GroupTwo<DeserializationStep<TClass>, DeserializationStep<? extends TProperty>, DeserializationStep<?>>
-    managed;
 
   public StepSetProperty(
     PropertyConfiguration<? extends TProperty> propertyConfiguration,
-    GroupTwo<DeserializationStep<TClass>, DeserializationStep<? extends TProperty>, DeserializationStep<?>>
-      managed,
+    StepGroupTwo<TClass, ? extends TProperty> managed,
     StepGroupMany unmanaged
   ) {
     this.propertyConfiguration = propertyConfiguration;
@@ -34,8 +30,8 @@ public class StepSetProperty<
   public DeserializationStepInstance<NoData> instantiated(DeserializationStep.InstanceFactory factory) {
     return new InstanceSetProperty<>(
       propertyConfiguration,
-      factory.instantiate(managed.getFirst()),
-      factory.instantiate(managed.getSecond()),
+      managed.instantiatedFirst(factory),
+      managed.instantiatedSecond(factory),
       unmanaged.instantiated(factory)
     );
   }

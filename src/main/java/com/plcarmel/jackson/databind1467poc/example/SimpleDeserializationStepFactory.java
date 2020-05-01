@@ -2,8 +2,8 @@ package com.plcarmel.jackson.databind1467poc.example;
 
 import com.fasterxml.jackson.core.JsonToken;
 import com.plcarmel.jackson.databind1467poc.example.builders.BasicBuilder;
-import com.plcarmel.jackson.databind1467poc.example.groups.GroupOne;
-import com.plcarmel.jackson.databind1467poc.example.groups.GroupTwo;
+import com.plcarmel.jackson.databind1467poc.example.groups.StepGroupOne;
+import com.plcarmel.jackson.databind1467poc.example.groups.StepGroupTwo;
 import com.plcarmel.jackson.databind1467poc.example.steps.*;
 import com.plcarmel.jackson.databind1467poc.theory.*;
 
@@ -17,7 +17,7 @@ public class SimpleDeserializationStepFactory implements DeserializationStepFact
 
   @Override
   public <T> DeserializationStepBuilder<T> builderStepAlso(DeserializationStep<T> mainDependency) {
-    return new BasicBuilder<>(l -> new StepAlso<>(new GroupOne<>(mainDependency), l));
+    return new BasicBuilder<>(l -> new StepAlso<>(new StepGroupOne<>(mainDependency), l));
   }
 
   @Override
@@ -59,7 +59,9 @@ public class SimpleDeserializationStepFactory implements DeserializationStepFact
     DeserializationStep<TClass> instantiationStep,
     DeserializationStep<? extends TProperty> valueDeserializationStep
   ) {
-    return new BasicBuilder<>(l -> new StepSetProperty<>(conf, new GroupTwo<>(instantiationStep, valueDeserializationStep), l));
+    return new BasicBuilder<>(l ->
+      new StepSetProperty<>(conf, new StepGroupTwo<>(instantiationStep, valueDeserializationStep), l)
+    );
   }
 
 }
