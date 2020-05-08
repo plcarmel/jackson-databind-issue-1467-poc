@@ -2,10 +2,13 @@ package com.plcarmel.jackson.databind1467poc.example;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import com.plcarmel.jackson.databind1467poc.example.builders.BasicBuilder;
+import com.plcarmel.jackson.databind1467poc.generic.builders.BasicBuilder;
 import com.plcarmel.jackson.databind1467poc.generic.groups.StepGroupOne;
 import com.plcarmel.jackson.databind1467poc.generic.groups.StepGroupTwo;
 import com.plcarmel.jackson.databind1467poc.example.steps.*;
+import com.plcarmel.jackson.databind1467poc.generic.steps.StepAlso;
+import com.plcarmel.jackson.databind1467poc.generic.steps.StepInstantiateUsingDefaultConstructor;
+import com.plcarmel.jackson.databind1467poc.generic.steps.StepSetProperty;
 import com.plcarmel.jackson.databind1467poc.theory.*;
 
 public class SimpleStepFactory implements StepFactory<JsonParser> {

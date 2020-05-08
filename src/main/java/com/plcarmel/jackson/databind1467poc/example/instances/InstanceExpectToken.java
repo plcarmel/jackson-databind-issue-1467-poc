@@ -7,6 +7,7 @@ import com.plcarmel.jackson.databind1467poc.generic.groups.AreDependenciesSatisf
 import com.plcarmel.jackson.databind1467poc.generic.groups.DependencyGroups;
 import com.plcarmel.jackson.databind1467poc.generic.groups.GetDependenciesMixin;
 import com.plcarmel.jackson.databind1467poc.generic.groups.InstanceGroupMany;
+import com.plcarmel.jackson.databind1467poc.generic.instances.InstanceHavingUnmanagedDependencies;
 import com.plcarmel.jackson.databind1467poc.generic.instances.NoDataMixin;
 import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.NoData;
@@ -19,7 +20,7 @@ import static java.util.Collections.emptyList;
 
 public final class InstanceExpectToken
   extends
-    InstanceHavingUnmanagedDependencies<JsonParser, NoData>
+  InstanceHavingUnmanagedDependencies<JsonParser, NoData>
   implements
     GetDependenciesMixin<StepInstance<JsonParser, ?>>,
     NoDataMixin<JsonParser>,

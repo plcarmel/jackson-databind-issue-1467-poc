@@ -1,8 +1,7 @@
-package com.plcarmel.jackson.databind1467poc.example.instances;
+package com.plcarmel.jackson.databind1467poc.generic.instances;
 
-import com.plcarmel.jackson.databind1467poc.example.configuration.FieldPropertyConfiguration;
+import com.plcarmel.jackson.databind1467poc.generic.configuration.FieldPropertyConfiguration;
 import com.plcarmel.jackson.databind1467poc.generic.groups.*;
-import com.plcarmel.jackson.databind1467poc.generic.instances.NoDataMixin;
 import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.NoData;
 import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;

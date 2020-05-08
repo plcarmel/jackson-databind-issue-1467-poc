@@ -8,6 +8,7 @@ import com.plcarmel.jackson.databind1467poc.generic.groups.AreDependenciesSatisf
 import com.plcarmel.jackson.databind1467poc.generic.groups.DependencyGroups;
 import com.plcarmel.jackson.databind1467poc.generic.groups.GetDependenciesMixin;
 import com.plcarmel.jackson.databind1467poc.generic.groups.InstanceGroupMany;
+import com.plcarmel.jackson.databind1467poc.generic.instances.InstanceHavingUnmanagedDependencies;
 import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;
 

@@ -1,7 +1,7 @@
-package com.plcarmel.jackson.databind1467poc.example.steps;
+package com.plcarmel.jackson.databind1467poc.generic.steps;
 
 import com.plcarmel.jackson.databind1467poc.generic.groups.*;
-import com.plcarmel.jackson.databind1467poc.example.instances.InstanceSetProperty;
+import com.plcarmel.jackson.databind1467poc.generic.instances.InstanceSetProperty;
 import com.plcarmel.jackson.databind1467poc.theory.*;
 
 import java.util.stream.Stream;

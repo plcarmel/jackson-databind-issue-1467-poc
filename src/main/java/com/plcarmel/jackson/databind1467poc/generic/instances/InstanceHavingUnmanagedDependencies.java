@@ -1,4 +1,4 @@
-package com.plcarmel.jackson.databind1467poc.example.instances;
+package com.plcarmel.jackson.databind1467poc.generic.instances;
 
 import com.plcarmel.jackson.databind1467poc.generic.groups.InstanceGroupMany;
 import com.plcarmel.jackson.databind1467poc.theory.StepInstance;

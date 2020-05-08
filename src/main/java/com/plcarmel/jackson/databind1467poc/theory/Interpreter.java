@@ -1,10 +1,9 @@
 package com.plcarmel.jackson.databind1467poc.theory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.plcarmel.jackson.databind1467poc.Utils.topologicalSort;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 // Main algorithm, it dispatches each token to the appropriate node (execution step) of the
 // dependency graph, starting with the leaves. If no leave can handle the current token, the
@@ -52,5 +51,23 @@ public class Interpreter<TInput, TResult> implements AsynchronousDeserialization
   @Override
   public TResult getData() {
     return finalStep.getData();
+  }
+
+  private static <T> List<T> topologicalSort(T startingPoint, Function<T, Collection<T>> getNodes) {
+    final List<T> result = new ArrayList<>();
+    final Set<T> visited = new HashSet<>();
+    List<T> lastElements = Collections.singletonList(startingPoint);
+    while (!lastElements.isEmpty()) {
+      result.addAll(lastElements);
+      visited.addAll(lastElements);
+      lastElements =
+        lastElements
+          .stream()
+          .flatMap(d -> getNodes.apply(d).stream())
+          .filter(d -> !visited.contains(d))
+          .collect(Collectors.toList());
+    }
+    Collections.reverse(result);
+    return result;
   }
 }

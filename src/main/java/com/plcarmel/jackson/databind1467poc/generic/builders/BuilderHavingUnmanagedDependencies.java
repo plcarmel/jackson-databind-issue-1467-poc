@@ -1,4 +1,4 @@
-package com.plcarmel.jackson.databind1467poc.example.builders;
+package com.plcarmel.jackson.databind1467poc.generic.builders;
 
 import com.plcarmel.jackson.databind1467poc.theory.Step;
 import com.plcarmel.jackson.databind1467poc.theory.StepBuilder;

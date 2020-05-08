@@ -1,4 +1,4 @@
-package com.plcarmel.jackson.databind1467poc.example.configuration;
+package com.plcarmel.jackson.databind1467poc.generic.configuration;
 
 import com.plcarmel.jackson.databind1467poc.theory.CreatorConfiguration;
 import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;

@@ -1,4 +1,4 @@
-package com.plcarmel.jackson.databind1467poc.example.configuration;
+package com.plcarmel.jackson.databind1467poc.generic.configuration;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;

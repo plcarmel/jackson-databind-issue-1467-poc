@@ -2,7 +2,7 @@ package com.plcarmel.jackson.databind1467poc.example;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
-import com.plcarmel.jackson.databind1467poc.example.configuration.CachedTypeConfigurationFactory;
+import com.plcarmel.jackson.databind1467poc.generic.configuration.CachedTypeConfigurationFactory;
 import com.plcarmel.jackson.databind1467poc.theory.StepBuilder;
 import com.plcarmel.jackson.databind1467poc.theory.Interpreter;
 
