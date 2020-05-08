@@ -1,7 +1,7 @@
 package com.plcarmel.jackson.databind1467poc;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.plcarmel.jackson.databind1467poc.example.ObjectMapper;
+import com.plcarmel.jackson.databind1467poc.jackson.ObjectMapper;
 import org.junit.Test;
 
 import java.io.IOException;

@@ -10,16 +10,19 @@ public class StepSetProperty<TInput, TClass, TProperty>
   implements Step<TInput, NoData>, GetDependenciesMixin<Step<TInput, ?>>
 {
   private final PropertyConfiguration<? extends TProperty> propertyConfiguration;
-  private final StepGroupTwo<TInput, TClass, ? extends TProperty> managed;
+  private final StepGroupOne<TInput, TClass> instantiationStep;
+  private final StepGroupOne<TInput, ? extends TProperty> deserializationStep;
   private final StepGroupMany<TInput> unmanaged;
 
   public StepSetProperty(
     PropertyConfiguration<? extends TProperty> propertyConfiguration,
-    StepGroupTwo<TInput, TClass, ? extends TProperty> managed,
+    StepGroupOne<TInput, TClass> instantiationStep,
+    StepGroupOne<TInput, ? extends TProperty> deserializationStep,
     StepGroupMany<TInput> unmanaged
   ) {
     this.propertyConfiguration = propertyConfiguration;
-    this.managed = managed;
+    this.instantiationStep = instantiationStep;
+    this.deserializationStep = deserializationStep;
     this.unmanaged = unmanaged;
   }
 
@@ -27,13 +30,14 @@ public class StepSetProperty<TInput, TClass, TProperty>
   public StepInstance<TInput, NoData> instantiated(InstanceFactory<TInput> factory) {
     return new InstanceSetProperty<>(
       propertyConfiguration,
-      managed.instantiated(factory),
+      instantiationStep.instantiated(factory),
+      deserializationStep.instantiated(factory),
       unmanaged.instantiated(factory)
     );
   }
 
   @Override
   public DependencyGroups<Step<TInput, ?>> getDependencyGroups() {
-    return new DependencyGroups<>(Stream.of(managed, unmanaged));
+    return new DependencyGroups<>(Stream.of(instantiationStep, deserializationStep, unmanaged));
   }
 }

@@ -10,6 +10,6 @@ public class StepGroupOne<TInput, TResult> extends GroupOne<Step<TInput, TResult
   }
 
   public InstanceGroupOne<TInput, TResult> instantiated(InstanceFactory<TInput> factory) {
-    return new InstanceGroupOne<>(factory.instantiate(getMain()));
+    return new InstanceGroupOne<>(factory.instantiate(get()));
   }
 }

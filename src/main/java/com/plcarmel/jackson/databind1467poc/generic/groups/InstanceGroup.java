@@ -4,7 +4,7 @@ import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.HasDependencies;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.function.Predicate;
 
 public interface InstanceGroup<TInput> extends HasDependencies<StepInstance<TInput, ?>> {
 
@@ -17,7 +17,7 @@ public interface InstanceGroup<TInput> extends HasDependencies<StepInstance<TInp
   }
 
   void prune(
-    Supplier<Boolean> doRemoveDependency,
+    Predicate<StepInstance<TInput, ?>> doRemoveDependency,
     Consumer<StepInstance<TInput, ?>> onDependencyRemoved,
     StepInstance<TInput, ?> ref
   );

@@ -1,9 +1,9 @@
-package com.plcarmel.jackson.databind1467poc.example.instances;
+package com.plcarmel.jackson.databind1467poc.jackson.instances;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import com.plcarmel.jackson.databind1467poc.example.SupportedTypes;
+import com.plcarmel.jackson.databind1467poc.jackson.SupportedTypes;
 import com.plcarmel.jackson.databind1467poc.generic.groups.AreDependenciesSatisfiedMixin;
 import com.plcarmel.jackson.databind1467poc.generic.groups.DependencyGroups;
 import com.plcarmel.jackson.databind1467poc.generic.groups.GetDependenciesMixin;

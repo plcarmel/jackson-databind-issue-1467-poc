@@ -4,7 +4,7 @@ import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.function.Predicate;
 
 public class InstanceGroupMany<TInput>
   extends GroupMany<StepInstance<TInput, ?>>
@@ -16,14 +16,14 @@ public class InstanceGroupMany<TInput>
 
   @Override
   public void prune(
-    Supplier<Boolean> doRemoveDependency,
+    Predicate<StepInstance<TInput, ?>> doRemoveDependency,
     Consumer<StepInstance<TInput, ?>> onDependencyRemoved,
     StepInstance<TInput, ?> ref
   ) {
     final List<StepInstance<TInput, ?>> dependencies = getDependencies();
     for (int i = 0; i < dependencies.size(); ) {
       final StepInstance<TInput, ?> d = dependencies.get(i);
-      if (d.isDone() && doRemoveDependency.get()) {
+      if (d.isDone() && doRemoveDependency.test(d)) {
         d.removeParent(ref);
         dependencies.remove(i);
         onDependencyRemoved.accept(d);

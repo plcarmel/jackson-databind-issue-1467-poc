@@ -16,7 +16,7 @@ public abstract class InstanceHavingUnmanagedDependencies<TInput, TResult> exten
   @Override
   public void prune(Consumer<StepInstance<TInput, ?>> onDependencyRemoved) {
     if (unmanaged != null) {
-      unmanaged.prune(() -> true, onDependencyRemoved, this);
+      unmanaged.prune(d -> true, onDependencyRemoved, this);
       if (unmanaged.isDone()) unmanaged = null;
     }
     super.prune(onDependencyRemoved);

@@ -1,11 +1,10 @@
-package com.plcarmel.jackson.databind1467poc.example;
+package com.plcarmel.jackson.databind1467poc.jackson;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import com.plcarmel.jackson.databind1467poc.generic.builders.BasicBuilder;
+import com.plcarmel.jackson.databind1467poc.generic.builders.UnmanagedDependenciesBuilder;
 import com.plcarmel.jackson.databind1467poc.generic.groups.StepGroupOne;
-import com.plcarmel.jackson.databind1467poc.generic.groups.StepGroupTwo;
-import com.plcarmel.jackson.databind1467poc.example.steps.*;
+import com.plcarmel.jackson.databind1467poc.jackson.steps.*;
 import com.plcarmel.jackson.databind1467poc.generic.steps.StepAlso;
 import com.plcarmel.jackson.databind1467poc.generic.steps.StepInstantiateUsingDefaultConstructor;
 import com.plcarmel.jackson.databind1467poc.generic.steps.StepSetProperty;
@@ -21,17 +20,17 @@ public class SimpleStepFactory implements StepFactory<JsonParser> {
 
   @Override
   public <TResult> StepBuilder<JsonParser, TResult> builderStepAlso(Step<JsonParser, TResult> mainDependency) {
-    return new BasicBuilder<>(l -> new StepAlso<>(new StepGroupOne<>(mainDependency), l));
+    return new UnmanagedDependenciesBuilder<>(u -> new StepAlso<>(new StepGroupOne<>(mainDependency), u));
   }
 
   @Override
   public <T> StepBuilder<JsonParser, T> builderDeserializeStandardType(PropertyConfiguration<T> conf) {
-    return new BasicBuilder<>(l -> new StepDeserializeStandardValue<>(conf, l));
+    return new UnmanagedDependenciesBuilder<>(u -> new StepDeserializeStandardValue<>(conf, u));
   }
 
   @Override
   public <T> StepBuilder<JsonParser, T> builderInstantiateUsingDefaultConstructor(TypeConfiguration<T> conf) {
-    return new BasicBuilder<>(l -> new StepInstantiateUsingDefaultConstructor<>(conf, l));
+    return new UnmanagedDependenciesBuilder<>(u -> new StepInstantiateUsingDefaultConstructor<>(conf, u));
   }
 
   @Override
@@ -41,7 +40,7 @@ public class SimpleStepFactory implements StepFactory<JsonParser> {
 
   @Override
   public StepBuilder<JsonParser, NoData> builderExpectTokenKind(JsonToken expectedTokenKind) {
-    return new BasicBuilder<>(l -> new StepExpectToken(expectedTokenKind, l));
+    return new UnmanagedDependenciesBuilder<>(u -> new StepExpectToken(expectedTokenKind, u));
   }
 
   @Override
@@ -49,7 +48,7 @@ public class SimpleStepFactory implements StepFactory<JsonParser> {
     JsonToken expectedTokenKind,
     Object expectedTokenValue
   ) {
-    return new BasicBuilder<>(l -> new StepExpectToken(expectedTokenKind, expectedTokenValue, l));
+    return new UnmanagedDependenciesBuilder<>(u -> new StepExpectToken(expectedTokenKind, expectedTokenValue, u));
   }
 
   @Override
@@ -63,8 +62,13 @@ public class SimpleStepFactory implements StepFactory<JsonParser> {
     Step<JsonParser, TClass> instantiationStep,
     Step<JsonParser, ? extends TProperty> valueDeserializationStep
   ) {
-    return new BasicBuilder<>(l ->
-      new StepSetProperty<>(conf, new StepGroupTwo<>(instantiationStep, valueDeserializationStep), l)
+    return new UnmanagedDependenciesBuilder<>(unmanaged ->
+      new StepSetProperty<>(
+        conf,
+        new StepGroupOne<>(instantiationStep),
+        new StepGroupOne<>(valueDeserializationStep),
+        unmanaged
+      )
     );
   }
 

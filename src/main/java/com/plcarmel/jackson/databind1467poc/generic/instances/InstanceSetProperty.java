@@ -18,21 +18,24 @@ public class InstanceSetProperty<TInput, TClass, TProperty>
     AreDependenciesSatisfiedMixin<TInput, NoData>
 {
   private final PropertyConfiguration<? extends TProperty> propertyConfiguration;
-  private InstanceGroupTwo<TInput, TClass, ? extends TProperty> managed;
+  private InstanceGroupOne<TInput, TClass> instantiationStep;
+  private InstanceGroupOne<TInput, ? extends TProperty> deserializationStep;
 
   public InstanceSetProperty(
     PropertyConfiguration<? extends TProperty> propertyConfiguration,
-    InstanceGroupTwo<TInput, TClass, ? extends TProperty> managed,
+    InstanceGroupOne<TInput, TClass> instantiationStep,
+    InstanceGroupOne<TInput, ? extends TProperty> deserializationStep,
     InstanceGroupMany<TInput> unmanaged
   ) {
     super(unmanaged);
     this.propertyConfiguration = propertyConfiguration;
-    this.managed = managed;
+    this.instantiationStep = instantiationStep;
+    this.deserializationStep = deserializationStep;
   }
 
   @Override
   public DependencyGroups<StepInstance<TInput, ?>> getDependencyGroups() {
-    return new DependencyGroups<>(Stream.of(managed, unmanaged));
+    return new DependencyGroups<>(Stream.of(instantiationStep, deserializationStep, unmanaged));
   }
 
   @Override
@@ -51,17 +54,10 @@ public class InstanceSetProperty<TInput, TClass, TProperty>
   }
 
   @Override
-  public boolean areDependenciesSatisfied() {
-    return (managed == null || managed.areDependenciesSatisfied())
-      && (unmanaged == null || unmanaged.areDependenciesSatisfied());
-  }
-
-  @Override
   public boolean isDone() {
-    return managed == null &&
-      ( unmanaged == null ||
-        unmanaged.getDependencies().stream().allMatch(StepInstance::areDependenciesSatisfied)
-      );
+    return instantiationStep == null &&
+      deserializationStep == null &&
+      ( unmanaged == null || unmanaged.areDependenciesSatisfied());
   }
 
   private void execute() {
@@ -70,7 +66,7 @@ public class InstanceSetProperty<TInput, TClass, TProperty>
       final FieldPropertyConfiguration<TClass, TProperty> fpc =
         (FieldPropertyConfiguration<TClass, TProperty>) propertyConfiguration;
       try {
-        fpc.getField().set(managed.getFirst().getData(), managed.getSecond().getData());
+        fpc.getField().set(instantiationStep.get().getData(), deserializationStep.get().getData());
       } catch (IllegalAccessException e) {
         throw new RuntimeException(e);
       }
@@ -79,21 +75,23 @@ public class InstanceSetProperty<TInput, TClass, TProperty>
 
   @Override
   public void prune(Consumer<StepInstance<TInput, ?>> onDependencyRemoved) {
-    if (managed != null) {
-      managed.prune(
-        () -> {
-          if (!managed.getFirst().isDone() || !managed.getSecond().isDone()) {
-            return false;
-          }
-          execute();
-          managed = null;
-          return true;
-        },
-        onDependencyRemoved,
-        this
-      );
+    if (instantiationStep != null) {
+      instantiationStep.prune(this::doRemoveDependency, onDependencyRemoved, this);
+      if (instantiationStep.get() == null) instantiationStep = null;
+    }
+    if (deserializationStep != null) {
+      deserializationStep.prune(this::doRemoveDependency, onDependencyRemoved, this);
+      if (deserializationStep.get() == null) deserializationStep = null;
     }
     super.prune(onDependencyRemoved);
+  }
+
+  private Boolean doRemoveDependency(StepInstance<TInput, ?> d) {
+    if (instantiationStep == null || deserializationStep == null) return true;
+    final InstanceGroupOne<TInput, ?> other = instantiationStep.get() == d ? deserializationStep : instantiationStep;
+    if (!other.isDone()) return false;
+    execute();
+    return true;
   }
 }
 

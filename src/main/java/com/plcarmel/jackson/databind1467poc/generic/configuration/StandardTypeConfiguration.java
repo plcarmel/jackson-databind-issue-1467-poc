@@ -7,8 +7,8 @@ import com.plcarmel.jackson.databind1467poc.theory.TypeConfiguration;
 import java.util.Collection;
 import java.util.Collections;
 
-import static com.plcarmel.jackson.databind1467poc.example.SupportedTypes.primitiveTypes;
-import static com.plcarmel.jackson.databind1467poc.example.SupportedTypes.unboxedToBoxed;
+import static com.plcarmel.jackson.databind1467poc.jackson.SupportedTypes.primitiveTypes;
+import static com.plcarmel.jackson.databind1467poc.jackson.SupportedTypes.unboxedToBoxed;
 
 public class StandardTypeConfiguration<T> implements TypeConfiguration<T> {
 

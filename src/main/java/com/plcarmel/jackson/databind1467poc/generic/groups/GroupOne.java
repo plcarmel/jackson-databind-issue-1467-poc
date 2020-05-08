@@ -8,18 +8,18 @@ import java.util.List;
 public class GroupOne<TMain extends TDep, TDep extends HasDependencies<TDep>>
   implements HasDependencies<TDep>
 {
-  protected TMain main;
+  protected TMain sole;
 
-  public TMain getMain() {
-    return main;
+  public TMain get() {
+    return sole;
   }
 
-  public GroupOne(TMain main) {
-    this.main = main;
+  public GroupOne(TMain sole) {
+    this.sole = sole;
   }
 
   @Override
   public List<TDep> getDependencies() {
-    return main == null ? Collections.emptyList() : Collections.singletonList(main);
+    return sole == null ? Collections.emptyList() : Collections.singletonList(sole);
   }
 }

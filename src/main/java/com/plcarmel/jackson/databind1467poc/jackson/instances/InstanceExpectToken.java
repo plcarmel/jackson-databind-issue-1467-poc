@@ -1,4 +1,4 @@
-package com.plcarmel.jackson.databind1467poc.example.instances;
+package com.plcarmel.jackson.databind1467poc.jackson.instances;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;

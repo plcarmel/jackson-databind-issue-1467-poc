@@ -1,10 +1,10 @@
-package com.plcarmel.jackson.databind1467poc.example.steps;
+package com.plcarmel.jackson.databind1467poc.jackson.steps;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.plcarmel.jackson.databind1467poc.generic.groups.DependencyGroups;
 import com.plcarmel.jackson.databind1467poc.generic.groups.GetDependenciesMixin;
 import com.plcarmel.jackson.databind1467poc.generic.groups.StepGroupMany;
-import com.plcarmel.jackson.databind1467poc.example.instances.InstanceDeserializeStandardValue;
+import com.plcarmel.jackson.databind1467poc.jackson.instances.InstanceDeserializeStandardValue;
 import com.plcarmel.jackson.databind1467poc.theory.InstanceFactory;
 import com.plcarmel.jackson.databind1467poc.theory.Step;
 import com.plcarmel.jackson.databind1467poc.theory.StepInstance;

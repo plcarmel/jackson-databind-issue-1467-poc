@@ -39,7 +39,7 @@ public class Interpreter<TInput, TResult> implements AsynchronousDeserialization
         .orElseThrow(() -> new IllegalStateException("No step can handle current token"));
     step.pushToken(parser);
     if (step.isDone()) {
-      new ArrayList<>(step.getParents()).forEach(p -> p.prune(startToFinish::remove));
+      step.prune(startToFinish::remove);
     }
   }
 

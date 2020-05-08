@@ -5,11 +5,11 @@ import com.plcarmel.jackson.databind1467poc.theory.Step;
 
 import java.util.function.Function;
 
-public class BasicBuilder<TInput, TResult> extends BuilderHavingUnmanagedDependencies<TInput, TResult> {
+public class UnmanagedDependenciesBuilder<TInput, TResult> extends BuilderHavingUnmanagedDependencies<TInput, TResult> {
 
   private final Function<StepGroupMany<TInput>, Step<TInput, TResult>> stepConstructor;
 
-  public BasicBuilder(Function<StepGroupMany<TInput>, Step<TInput, TResult>> stepConstructor) {
+  public UnmanagedDependenciesBuilder(Function<StepGroupMany<TInput>, Step<TInput, TResult>> stepConstructor) {
     this.stepConstructor = stepConstructor;
   }
 

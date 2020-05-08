@@ -47,13 +47,13 @@ public final class InstanceAlso<TInput, TResult>
   }
 
   private void execute() {
-    data = managed.getMain().getData();
+    data = managed.get().getData();
   }
 
   @Override
   public void prune(Consumer<StepInstance<TInput, ?>> onDependencyRemoved) {
     if (managed != null) {
-      managed.prune(() -> { execute(); return true; }, onDependencyRemoved, this);
+      managed.prune(d -> { execute(); return true; }, onDependencyRemoved, this);
       if (managed.isDone()) managed = null;
     }
     super.prune(onDependencyRemoved);

@@ -5,7 +5,7 @@ import com.plcarmel.jackson.databind1467poc.theory.TypeConfiguration;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.plcarmel.jackson.databind1467poc.example.SupportedTypes.standardTypeClasses;
+import static com.plcarmel.jackson.databind1467poc.jackson.SupportedTypes.standardTypeClasses;
 
 public class CachedTypeConfigurationFactory {
 
