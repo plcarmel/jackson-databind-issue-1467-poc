@@ -23,7 +23,7 @@ public class StepDeserializeStandardValue<T>
 
   @Override
   public DeserializationStepInstance<T> instantiated(DeserializationStep.InstanceFactory factory) {
-    return new InstanceDeserializeStandardValue<>(conf, unmanaged.instantiated(factory).getDependencies() /* tmp */);
+    return new InstanceDeserializeStandardValue<>(conf, unmanaged.instantiated(factory));
   }
 
   @Override

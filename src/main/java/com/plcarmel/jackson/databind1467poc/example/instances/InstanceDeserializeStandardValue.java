@@ -4,25 +4,33 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.plcarmel.jackson.databind1467poc.example.SupportedTypes;
+import com.plcarmel.jackson.databind1467poc.example.groups.DependencyGroups;
+import com.plcarmel.jackson.databind1467poc.example.groups.GetDependenciesMixin;
+import com.plcarmel.jackson.databind1467poc.example.groups.InstanceGroupMany;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static com.fasterxml.jackson.core.JsonToken.VALUE_TRUE;
 
-public final class InstanceDeserializeStandardValue<T> extends InstanceHavingUnmanagedDependencies<T> {
-
+public final class InstanceDeserializeStandardValue<T>
+  extends InstanceBase<T>
+  implements GetDependenciesMixin<DeserializationStepInstance<?>>
+{
   private final PropertyConfiguration<T> conf;
+  private InstanceGroupMany unmanaged;
   private T data;
-  private boolean isDone = false;
+  private boolean isPropertyRead = false;
 
   public InstanceDeserializeStandardValue(
     PropertyConfiguration<T> conf,
-    List<DeserializationStepInstance<?>> dependencies
+    InstanceGroupMany unmanaged
   ) {
-    super(dependencies);
+    this.unmanaged = unmanaged;
     this.conf = conf;
   }
 
@@ -44,7 +52,7 @@ public final class InstanceDeserializeStandardValue<T> extends InstanceHavingUnm
       case VALUE_NULL:
         if (conf.isRequired()) throw new JsonParseException(parser, "Value is required");
         data = null;
-        isDone = true;
+        isPropertyRead = true;
         parser.nextToken();
         break;
       case VALUE_FALSE:
@@ -60,7 +68,7 @@ public final class InstanceDeserializeStandardValue<T> extends InstanceHavingUnm
         if (classes == null) throw notTheAppropriateType;
         //noinspection unchecked
         data = (T) SupportedTypes.typeToValueParser.get(typeClass).apply(parser);
-        isDone = true;
+        isPropertyRead = true;
         parser.nextToken();
         break;
       default:
@@ -74,12 +82,35 @@ public final class InstanceDeserializeStandardValue<T> extends InstanceHavingUnm
   }
 
   @Override
+  public boolean areDependenciesSatisfied() {
+    return getDependencies().stream().allMatch(DeserializationStepInstance::areDependenciesSatisfied);
+  }
+
+  @Override
   public boolean isDone() {
-    return isDone && super.areDependenciesSatisfied();
+    return isPropertyRead && areDependenciesSatisfied();
+  }
+
+  @Override
+  public void prune(Consumer<DeserializationStepInstance<?>> onDependencyRemoved) {
+    if (unmanaged != null) {
+      unmanaged.prune(() -> true, onDependencyRemoved, this);
+      if (unmanaged.getDependencies().stream().allMatch(DeserializationStepInstance::isDone)) {
+        unmanaged = null;
+      }
+    }
+    if (isDone()) {
+      new ArrayList<>(getParents()).forEach(p -> p.prune(onDependencyRemoved));
+    }
   }
 
   @Override
   public T getData() {
     return data;
+  }
+
+  @Override
+  public DependencyGroups<DeserializationStepInstance<?>> getDependencyGroups() {
+    return new DependencyGroups<>(Stream.of(unmanaged));
   }
 }

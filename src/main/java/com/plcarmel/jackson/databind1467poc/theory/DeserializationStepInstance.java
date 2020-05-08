@@ -9,8 +9,8 @@ public interface DeserializationStepInstance<T>
 
   extends HasDependencies<DeserializationStepInstance<?>>, AsynchronousDeserialization<T> {
   boolean isOptional();
-  boolean isDone();
   boolean areDependenciesSatisfied();
+  boolean isDone();
 
   Set<DeserializationStepInstance<?>> getParents();
 

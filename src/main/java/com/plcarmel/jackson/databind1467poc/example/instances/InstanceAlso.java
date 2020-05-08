@@ -60,21 +60,21 @@ public final class InstanceAlso<T> extends InstanceBase<T>
   }
 
   @Override
-  public void prune(Consumer<DeserializationStepInstance<?>> onRemoved) {
+  public void prune(Consumer<DeserializationStepInstance<?>> onDependencyRemoved) {
     if (managed != null) {
-      managed.prune(() -> { data = managed.getMain().getData(); return true; }, onRemoved, this);
+      managed.prune(() -> { data = managed.getMain().getData(); return true; }, onDependencyRemoved, this);
       if (managed.getDependencies().stream().allMatch(DeserializationStepInstance::isDone)) {
         managed = null;
       }
     }
     if (unmanaged != null) {
-      unmanaged.prune(() -> true, onRemoved, this);
+      unmanaged.prune(() -> true, onDependencyRemoved, this);
       if (unmanaged.getDependencies().stream().allMatch(DeserializationStepInstance::isDone)) {
         unmanaged = null;
       }
     }
     if (isDone()) {
-      new ArrayList<>(getParents()).forEach(p -> p.prune(onRemoved));
+      new ArrayList<>(getParents()).forEach(p -> p.prune(onDependencyRemoved));
     }
   }
 
