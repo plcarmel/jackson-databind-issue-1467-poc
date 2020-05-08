@@ -53,25 +53,18 @@ public final class InstanceAlso<T> extends InstanceBase<T>
 
   @Override
   public boolean isDone() {
-    return managed == null &&
-      ( unmanaged == null ||
-        unmanaged.getDependencies().stream().allMatch(d -> d.isOptional() || d.areDependenciesSatisfied())
-      );
+    return managed == null && (unmanaged == null || unmanaged.areDependenciesSatisfied());
   }
 
   @Override
   public void prune(Consumer<DeserializationStepInstance<?>> onDependencyRemoved) {
     if (managed != null) {
       managed.prune(() -> { data = managed.getMain().getData(); return true; }, onDependencyRemoved, this);
-      if (managed.getDependencies().stream().allMatch(DeserializationStepInstance::isDone)) {
-        managed = null;
-      }
+      if (managed.isDone()) managed = null;
     }
     if (unmanaged != null) {
       unmanaged.prune(() -> true, onDependencyRemoved, this);
-      if (unmanaged.getDependencies().stream().allMatch(DeserializationStepInstance::isDone)) {
-        unmanaged = null;
-      }
+      if (unmanaged.isDone()) unmanaged = null;
     }
     if (isDone()) {
       new ArrayList<>(getParents()).forEach(p -> p.prune(onDependencyRemoved));

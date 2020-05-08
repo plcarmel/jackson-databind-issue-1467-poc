@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 
 public class InstanceGroupOne<T>
   extends GroupOne<DeserializationStepInstance<T>, DeserializationStepInstance<?>>
-  implements Prunable
+  implements InstanceGroup
 {
   public InstanceGroupOne(DeserializationStepInstance<T> main) {
     super(main);

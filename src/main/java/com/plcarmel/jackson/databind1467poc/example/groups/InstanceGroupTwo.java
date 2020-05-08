@@ -10,7 +10,7 @@ public class InstanceGroupTwo<TFirst, TSecond>
     DeserializationStepInstance<TFirst>,
     DeserializationStepInstance<TSecond>,
     DeserializationStepInstance<?>
-  > implements Prunable
+  > implements InstanceGroup
 {
   public InstanceGroupTwo(DeserializationStepInstance<TFirst> first, DeserializationStepInstance<TSecond> second) {
     super(first, second);

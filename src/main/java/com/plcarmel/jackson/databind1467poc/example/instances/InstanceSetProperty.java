@@ -88,7 +88,6 @@ public class InstanceSetProperty<TClass, TProperty>
           }
           execute();
           managed = null;
-          unmanaged = null;
           return true;
         },
         onRemoved,
@@ -97,9 +96,7 @@ public class InstanceSetProperty<TClass, TProperty>
     }
     if (unmanaged != null) {
       unmanaged.prune(() -> true, onRemoved, this);
-      if (unmanaged.getDependencies().stream().allMatch(DeserializationStepInstance::isDone)) {
-        unmanaged = null;
-      }
+      if (unmanaged.isDone()) unmanaged = null;
     }
     if (isDone()) {
       new ArrayList<>(getParents()).forEach(p -> p.prune(onRemoved));

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class InstanceGroupMany extends GroupMany<DeserializationStepInstance<?>> implements Prunable {
+public class InstanceGroupMany extends GroupMany<DeserializationStepInstance<?>> implements InstanceGroup {
 
   public InstanceGroupMany(List<DeserializationStepInstance<?>> list) {
     super(list);

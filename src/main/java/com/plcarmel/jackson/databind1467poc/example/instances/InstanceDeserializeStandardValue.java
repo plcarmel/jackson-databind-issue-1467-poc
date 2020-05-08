@@ -95,9 +95,7 @@ public final class InstanceDeserializeStandardValue<T>
   public void prune(Consumer<DeserializationStepInstance<?>> onDependencyRemoved) {
     if (unmanaged != null) {
       unmanaged.prune(() -> true, onDependencyRemoved, this);
-      if (unmanaged.getDependencies().stream().allMatch(DeserializationStepInstance::isDone)) {
-        unmanaged = null;
-      }
+      if (unmanaged.isDone()) unmanaged = null;
     }
     if (isDone()) {
       new ArrayList<>(getParents()).forEach(p -> p.prune(onDependencyRemoved));
