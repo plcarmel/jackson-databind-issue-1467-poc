@@ -1,4 +1,4 @@
-package com.plcarmel.jackson.databind1467poc.example.groups;
+package com.plcarmel.jackson.databind1467poc.generic.groups;
 
 import com.plcarmel.jackson.databind1467poc.theory.HasDependencies;
 

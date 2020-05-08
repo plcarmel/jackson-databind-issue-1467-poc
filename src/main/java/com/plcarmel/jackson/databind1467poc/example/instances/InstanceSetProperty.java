@@ -1,29 +1,30 @@
 package com.plcarmel.jackson.databind1467poc.example.instances;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.plcarmel.jackson.databind1467poc.example.configuration.FieldPropertyConfiguration;
-import com.plcarmel.jackson.databind1467poc.example.groups.DependencyGroups;
-import com.plcarmel.jackson.databind1467poc.example.groups.GetDependenciesMixin;
-import com.plcarmel.jackson.databind1467poc.example.groups.InstanceGroupMany;
-import com.plcarmel.jackson.databind1467poc.example.groups.InstanceGroupTwo;
-import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
+import com.plcarmel.jackson.databind1467poc.generic.groups.*;
+import com.plcarmel.jackson.databind1467poc.generic.instances.NoDataMixin;
+import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.NoData;
 import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;
 
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public class InstanceSetProperty<TClass, TProperty>
-  extends InstanceHavingUnmanagedDependencies<NoData>
-  implements GetDependenciesMixin<DeserializationStepInstance<?>>, NoDataMixin
+public class InstanceSetProperty<TInput, TClass, TProperty>
+  extends
+  InstanceHavingUnmanagedDependencies<TInput, NoData>
+  implements
+    GetDependenciesMixin<StepInstance<TInput, ?>>,
+    NoDataMixin<TInput>,
+    AreDependenciesSatisfiedMixin<TInput, NoData>
 {
   private final PropertyConfiguration<? extends TProperty> propertyConfiguration;
-  private InstanceGroupTwo<TClass, ? extends TProperty> managed;
+  private InstanceGroupTwo<TInput, TClass, ? extends TProperty> managed;
 
   public InstanceSetProperty(
     PropertyConfiguration<? extends TProperty> propertyConfiguration,
-    InstanceGroupTwo<TClass, ? extends TProperty> managed,
-    InstanceGroupMany unmanaged
+    InstanceGroupTwo<TInput, TClass, ? extends TProperty> managed,
+    InstanceGroupMany<TInput> unmanaged
   ) {
     super(unmanaged);
     this.propertyConfiguration = propertyConfiguration;
@@ -31,7 +32,7 @@ public class InstanceSetProperty<TClass, TProperty>
   }
 
   @Override
-  public DependencyGroups<DeserializationStepInstance<?>> getDependencyGroups() {
+  public DependencyGroups<StepInstance<TInput, ?>> getDependencyGroups() {
     return new DependencyGroups<>(Stream.of(managed, unmanaged));
   }
 
@@ -41,12 +42,12 @@ public class InstanceSetProperty<TClass, TProperty>
   }
 
   @Override
-  public boolean canHandleCurrentToken(JsonParser parser) {
+  public boolean canHandleCurrentToken(TInput parser) {
     return false;
   }
 
   @Override
-  public void pushToken(JsonParser parser) {
+  public void pushToken(TInput parser) {
     throw new RuntimeException("Method should not be called.");
   }
 
@@ -60,7 +61,7 @@ public class InstanceSetProperty<TClass, TProperty>
   public boolean isDone() {
     return managed == null &&
       ( unmanaged == null ||
-        unmanaged.getDependencies().stream().allMatch(DeserializationStepInstance::areDependenciesSatisfied)
+        unmanaged.getDependencies().stream().allMatch(StepInstance::areDependenciesSatisfied)
       );
   }
 
@@ -78,7 +79,7 @@ public class InstanceSetProperty<TClass, TProperty>
   }
 
   @Override
-  public void prune(Consumer<DeserializationStepInstance<?>> onDependencyRemoved) {
+  public void prune(Consumer<StepInstance<TInput, ?>> onDependencyRemoved) {
     if (managed != null) {
       managed.prune(
         () -> {

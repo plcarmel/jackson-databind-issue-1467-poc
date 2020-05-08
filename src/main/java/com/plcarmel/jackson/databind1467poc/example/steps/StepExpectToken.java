@@ -1,59 +1,61 @@
 package com.plcarmel.jackson.databind1467poc.example.steps;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import com.plcarmel.jackson.databind1467poc.example.groups.DependencyGroups;
-import com.plcarmel.jackson.databind1467poc.example.groups.GetDependenciesMixin;
-import com.plcarmel.jackson.databind1467poc.example.groups.StepGroupMany;
+import com.plcarmel.jackson.databind1467poc.generic.groups.DependencyGroups;
+import com.plcarmel.jackson.databind1467poc.generic.groups.GetDependenciesMixin;
+import com.plcarmel.jackson.databind1467poc.generic.groups.StepGroupMany;
 import com.plcarmel.jackson.databind1467poc.example.instances.InstanceExpectToken;
-import com.plcarmel.jackson.databind1467poc.theory.DeserializationStep;
-import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
+import com.plcarmel.jackson.databind1467poc.theory.InstanceFactory;
+import com.plcarmel.jackson.databind1467poc.theory.Step;
+import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.NoData;
 
 public class StepExpectToken
-  implements DeserializationStep<NoData>, GetDependenciesMixin<DeserializationStep<?>>
+  implements Step<JsonParser, NoData>, GetDependenciesMixin<Step<JsonParser, ?>>
 {
   private final JsonToken expectedTokenKind;
   private final Object expectedTokenValue;
   private final boolean useTokenValue;
-  private final StepGroupMany unmanagedDependencies;
+  private final StepGroupMany<JsonParser> unmanaged;
 
   public StepExpectToken(
     JsonToken expectedTokenKind,
     Object expectedTokenValue,
-    StepGroupMany unmanagedDependencies
+    StepGroupMany<JsonParser> unmanaged
   ) {
     this.expectedTokenKind = expectedTokenKind;
     this.expectedTokenValue = expectedTokenValue;
-    this.unmanagedDependencies = unmanagedDependencies;
+    this.unmanaged = unmanaged;
     useTokenValue = true;
   }
 
   public StepExpectToken(
     JsonToken expectedTokenKind,
-    StepGroupMany unmanagedDependencies
+    StepGroupMany<JsonParser> unmanaged
   ) {
     this.expectedTokenKind = expectedTokenKind;
     this.expectedTokenValue = null;
-    this.unmanagedDependencies = unmanagedDependencies;
+    this.unmanaged = unmanaged;
     useTokenValue = false;
   }
 
   @Override
-  public DeserializationStepInstance<NoData> instantiated(InstanceFactory factory) {
+  public StepInstance<JsonParser, NoData> instantiated(InstanceFactory<JsonParser> factory) {
     return useTokenValue
       ? new InstanceExpectToken(
         expectedTokenKind,
         expectedTokenValue,
-        unmanagedDependencies.instantiated(factory)
+        unmanaged.instantiated(factory)
       )
       : new InstanceExpectToken(
         expectedTokenKind,
-        unmanagedDependencies.instantiated(factory)
+        unmanaged.instantiated(factory)
       );
   }
 
   @Override
-  public DependencyGroups<DeserializationStep<?>> getDependencyGroups() {
+  public DependencyGroups<Step<JsonParser, ?>> getDependencyGroups() {
     return null;
   }
 }

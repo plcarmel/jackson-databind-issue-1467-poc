@@ -1,38 +1,38 @@
 package com.plcarmel.jackson.databind1467poc.example.instances;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.plcarmel.jackson.databind1467poc.example.groups.DependencyGroups;
-import com.plcarmel.jackson.databind1467poc.example.groups.GetDependenciesMixin;
-import com.plcarmel.jackson.databind1467poc.example.groups.InstanceGroupMany;
-import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
+import com.plcarmel.jackson.databind1467poc.generic.groups.AreDependenciesSatisfiedMixin;
+import com.plcarmel.jackson.databind1467poc.generic.groups.DependencyGroups;
+import com.plcarmel.jackson.databind1467poc.generic.groups.GetDependenciesMixin;
+import com.plcarmel.jackson.databind1467poc.generic.groups.InstanceGroupMany;
+import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.TypeConfiguration;
 
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public final class InstanceInstantiateUsingDefaultConstructor<T>
-  extends InstanceHavingUnmanagedDependencies<T>
-  implements GetDependenciesMixin<DeserializationStepInstance<?>>
+public final class InstanceInstantiateUsingDefaultConstructor<TInput, TResult>
+  extends InstanceHavingUnmanagedDependencies<TInput, TResult>
+  implements GetDependenciesMixin<StepInstance<TInput, ?>>, AreDependenciesSatisfiedMixin<TInput, TResult>
 {
 
-  private final Class<T> typeClass;
-  private T data;
+  private final Class<TResult> typeClass;
+  private TResult data;
 
   public InstanceInstantiateUsingDefaultConstructor(
-    TypeConfiguration<T> typeConfiguration,
-    InstanceGroupMany unmanaged
+    TypeConfiguration<TResult> typeConfiguration,
+    InstanceGroupMany<TInput> unmanaged
   ) {
     super(unmanaged);
     typeClass = typeConfiguration.getTypeClass();
   }
 
   @Override
-  public boolean canHandleCurrentToken(JsonParser parser) {
+  public boolean canHandleCurrentToken(TInput parser) {
     return false;
   }
 
   @Override
-  public void pushToken(JsonParser parser) {
+  public void pushToken(TInput parser) {
     throw new RuntimeException("Not supposed to be called.");
   }
 
@@ -42,22 +42,17 @@ public final class InstanceInstantiateUsingDefaultConstructor<T>
   }
 
   @Override
-  public boolean areDependenciesSatisfied() {
-    return unmanaged == null || unmanaged.areDependenciesSatisfied();
-  }
-
-  @Override
   public boolean isDone() {
     return data != null;
   }
 
   @Override
-  public T getData() {
+  public TResult getData() {
     return data;
   }
 
   @Override
-  public void prune(Consumer<DeserializationStepInstance<?>> onRemoved) {
+  public void prune(Consumer<StepInstance<TInput, ?>> onRemoved) {
     if (data == null) {
       try {
         data = typeClass.newInstance();
@@ -69,7 +64,7 @@ public final class InstanceInstantiateUsingDefaultConstructor<T>
   }
 
   @Override
-  public DependencyGroups<DeserializationStepInstance<?>> getDependencyGroups() {
+  public DependencyGroups<StepInstance<TInput, ?>> getDependencyGroups() {
     return new DependencyGroups<>(Stream.of(unmanaged));
   }
 }

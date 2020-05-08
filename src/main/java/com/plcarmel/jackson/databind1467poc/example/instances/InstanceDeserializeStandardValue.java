@@ -4,10 +4,11 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.plcarmel.jackson.databind1467poc.example.SupportedTypes;
-import com.plcarmel.jackson.databind1467poc.example.groups.DependencyGroups;
-import com.plcarmel.jackson.databind1467poc.example.groups.GetDependenciesMixin;
-import com.plcarmel.jackson.databind1467poc.example.groups.InstanceGroupMany;
-import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
+import com.plcarmel.jackson.databind1467poc.generic.groups.AreDependenciesSatisfiedMixin;
+import com.plcarmel.jackson.databind1467poc.generic.groups.DependencyGroups;
+import com.plcarmel.jackson.databind1467poc.generic.groups.GetDependenciesMixin;
+import com.plcarmel.jackson.databind1467poc.generic.groups.InstanceGroupMany;
+import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;
 
 import java.io.IOException;
@@ -16,17 +17,17 @@ import java.util.stream.Stream;
 
 import static com.fasterxml.jackson.core.JsonToken.VALUE_TRUE;
 
-public final class InstanceDeserializeStandardValue<T>
-  extends InstanceHavingUnmanagedDependencies<T>
-  implements GetDependenciesMixin<DeserializationStepInstance<?>>
+public final class InstanceDeserializeStandardValue<TResult>
+  extends InstanceHavingUnmanagedDependencies<JsonParser, TResult>
+  implements GetDependenciesMixin<StepInstance<JsonParser, ?>>, AreDependenciesSatisfiedMixin<JsonParser, TResult>
 {
-  private final PropertyConfiguration<T> conf;
-  private T data;
+  private final PropertyConfiguration<TResult> conf;
+  private TResult data;
   private boolean isPropertyDeserialized = false;
 
   public InstanceDeserializeStandardValue(
-    PropertyConfiguration<T> conf,
-    InstanceGroupMany unmanaged
+    PropertyConfiguration<TResult> conf,
+    InstanceGroupMany<JsonParser> unmanaged
   ) {
     super(unmanaged);
     this.conf = conf;
@@ -43,7 +44,7 @@ public final class InstanceDeserializeStandardValue<T>
     // more sophisticated than this. We are not supporting dates, among other things.
     final JsonParseException notTheAppropriateType = new JsonParseException(parser, "Not the appropriate type.");
     final JsonToken currentToken = parser.getCurrentToken();
-    final Class<T> typeClass = conf.getTypeConfiguration().getTypeClass();
+    final Class<TResult> typeClass = conf.getTypeConfiguration().getTypeClass();
     switch (currentToken) {
       case NOT_AVAILABLE:
         break;
@@ -57,7 +58,7 @@ public final class InstanceDeserializeStandardValue<T>
       case VALUE_TRUE:
         if (typeClass != Boolean.class) throw notTheAppropriateType;
         //noinspection unchecked
-        data = (T) (currentToken == VALUE_TRUE ? Boolean.TRUE : Boolean.FALSE);
+        data = (TResult) (currentToken == VALUE_TRUE ? Boolean.TRUE : Boolean.FALSE);
         break;
       case VALUE_NUMBER_FLOAT:
       case VALUE_NUMBER_INT:
@@ -65,7 +66,7 @@ public final class InstanceDeserializeStandardValue<T>
         final Set<Class<?>> classes = SupportedTypes.tokenToSupportedTypes.get(currentToken);
         if (classes == null) throw notTheAppropriateType;
         //noinspection unchecked
-        data = (T) SupportedTypes.typeToValueParser.get(typeClass).apply(parser);
+        data = (TResult) SupportedTypes.typeToValueParser.get(typeClass).apply(parser);
         isPropertyDeserialized = true;
         parser.nextToken();
         break;
@@ -80,22 +81,17 @@ public final class InstanceDeserializeStandardValue<T>
   }
 
   @Override
-  public boolean areDependenciesSatisfied() {
-    return unmanaged == null || unmanaged.areDependenciesSatisfied();
-  }
-
-  @Override
   public boolean isDone() {
     return isPropertyDeserialized && areDependenciesSatisfied();
   }
 
   @Override
-  public T getData() {
+  public TResult getData() {
     return data;
   }
 
   @Override
-  public DependencyGroups<DeserializationStepInstance<?>> getDependencyGroups() {
+  public DependencyGroups<StepInstance<JsonParser, ?>> getDependencyGroups() {
     return new DependencyGroups<>(Stream.of(unmanaged));
   }
 }

@@ -1,33 +1,35 @@
 package com.plcarmel.jackson.databind1467poc.example.steps;
 
-import com.plcarmel.jackson.databind1467poc.example.groups.DependencyGroups;
-import com.plcarmel.jackson.databind1467poc.example.groups.GetDependenciesMixin;
-import com.plcarmel.jackson.databind1467poc.example.groups.StepGroupMany;
+import com.fasterxml.jackson.core.JsonParser;
+import com.plcarmel.jackson.databind1467poc.generic.groups.DependencyGroups;
+import com.plcarmel.jackson.databind1467poc.generic.groups.GetDependenciesMixin;
+import com.plcarmel.jackson.databind1467poc.generic.groups.StepGroupMany;
 import com.plcarmel.jackson.databind1467poc.example.instances.InstanceDeserializeStandardValue;
-import com.plcarmel.jackson.databind1467poc.theory.DeserializationStep;
-import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
+import com.plcarmel.jackson.databind1467poc.theory.InstanceFactory;
+import com.plcarmel.jackson.databind1467poc.theory.Step;
+import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;
 
 import java.util.stream.Stream;
 
-public class StepDeserializeStandardValue<T>
-  implements DeserializationStep<T>, GetDependenciesMixin<DeserializationStep<?>>
+public class StepDeserializeStandardValue<TResult>
+  implements Step<JsonParser, TResult>, GetDependenciesMixin<Step<JsonParser, ?>>
 {
-  private final PropertyConfiguration<T> conf;
-  private final StepGroupMany unmanaged;
+  private final PropertyConfiguration<TResult> conf;
+  private final StepGroupMany<JsonParser> unmanaged;
 
-  public StepDeserializeStandardValue(PropertyConfiguration<T> conf, StepGroupMany unmanaged) {
+  public StepDeserializeStandardValue(PropertyConfiguration<TResult> conf, StepGroupMany<JsonParser> unmanaged) {
     this.conf = conf;
     this.unmanaged = unmanaged;
   }
 
   @Override
-  public DeserializationStepInstance<T> instantiated(DeserializationStep.InstanceFactory factory) {
+  public StepInstance<JsonParser, TResult> instantiated(InstanceFactory<JsonParser> factory) {
     return new InstanceDeserializeStandardValue<>(conf, unmanaged.instantiated(factory));
   }
 
   @Override
-  public DependencyGroups<DeserializationStep<?>> getDependencyGroups() {
+  public DependencyGroups<Step<JsonParser, ?>> getDependencyGroups() {
     return new DependencyGroups<>(Stream.of(unmanaged));
   }
 }

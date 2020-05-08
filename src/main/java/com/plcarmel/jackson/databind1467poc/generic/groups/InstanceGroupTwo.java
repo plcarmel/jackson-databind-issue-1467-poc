@@ -1,26 +1,29 @@
-package com.plcarmel.jackson.databind1467poc.example.groups;
+package com.plcarmel.jackson.databind1467poc.generic.groups;
 
-import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
+import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class InstanceGroupTwo<TFirst, TSecond>
+public class InstanceGroupTwo<TInput, TFirst, TSecond>
   extends GroupTwo<
-    DeserializationStepInstance<TFirst>,
-    DeserializationStepInstance<TSecond>,
-    DeserializationStepInstance<?>
-  > implements InstanceGroup
+  StepInstance<TInput, TFirst>,
+  StepInstance<TInput, TSecond>,
+  StepInstance<TInput, ?>
+  > implements InstanceGroup<TInput>
 {
-  public InstanceGroupTwo(DeserializationStepInstance<TFirst> first, DeserializationStepInstance<TSecond> second) {
+  public InstanceGroupTwo(
+    StepInstance<TInput, TFirst> first,
+    StepInstance<TInput, TSecond> second
+  ) {
     super(first, second);
   }
 
   @Override
   public void prune(
     Supplier<Boolean> doRemoveDependency,
-    Consumer<DeserializationStepInstance<?>> onDependencyRemoved,
-    DeserializationStepInstance<?> ref
+    Consumer<StepInstance<TInput, ?>> onDependencyRemoved,
+    StepInstance<TInput, ?> ref
   ) {
     final boolean firstDone = first != null && first.isDone();
     final boolean secondDone = second != null && second.isDone();

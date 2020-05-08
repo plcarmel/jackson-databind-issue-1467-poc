@@ -1,25 +1,21 @@
 package com.plcarmel.jackson.databind1467poc.example.instances;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.plcarmel.jackson.databind1467poc.example.groups.DependencyGroups;
-import com.plcarmel.jackson.databind1467poc.example.groups.GetDependenciesMixin;
-import com.plcarmel.jackson.databind1467poc.example.groups.InstanceGroupMany;
-import com.plcarmel.jackson.databind1467poc.example.groups.InstanceGroupOne;
-import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
+import com.plcarmel.jackson.databind1467poc.generic.groups.*;
+import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public final class InstanceAlso<T>
-  extends InstanceHavingUnmanagedDependencies<T>
-  implements GetDependenciesMixin<DeserializationStepInstance<?>>
+public final class InstanceAlso<TInput, TResult>
+  extends InstanceHavingUnmanagedDependencies<TInput, TResult>
+  implements GetDependenciesMixin<StepInstance<TInput, ?>>, AreDependenciesSatisfiedMixin<TInput, TResult>
 {
-  private InstanceGroupOne<T> managed;
-  private T data;
+  private InstanceGroupOne<TInput, TResult> managed;
+  private TResult data;
 
   public InstanceAlso(
-    InstanceGroupOne<T> managed,
-    InstanceGroupMany unmanaged
+    InstanceGroupOne<TInput, TResult> managed,
+    InstanceGroupMany<TInput> unmanaged
   ) {
     super(unmanaged);
     this.managed = managed;
@@ -31,23 +27,17 @@ public final class InstanceAlso<T>
   }
 
   @Override
-  public boolean canHandleCurrentToken(JsonParser parser) {
+  public boolean canHandleCurrentToken(TInput parser) {
     return false;
   }
 
   @Override
-  public void pushToken(JsonParser parser) {
+  public void pushToken(TInput input) {
     throw new RuntimeException("Method should not be called.");
   }
 
   @Override
-  public boolean areDependenciesSatisfied() {
-    return (managed == null || managed.areDependenciesSatisfied()) &&
-      (unmanaged == null || unmanaged.areDependenciesSatisfied());
-  }
-
-  @Override
-  public T getData() {
+  public TResult getData() {
     return data;
   }
 
@@ -61,7 +51,7 @@ public final class InstanceAlso<T>
   }
 
   @Override
-  public void prune(Consumer<DeserializationStepInstance<?>> onDependencyRemoved) {
+  public void prune(Consumer<StepInstance<TInput, ?>> onDependencyRemoved) {
     if (managed != null) {
       managed.prune(() -> { execute(); return true; }, onDependencyRemoved, this);
       if (managed.isDone()) managed = null;
@@ -70,7 +60,7 @@ public final class InstanceAlso<T>
   }
 
   @Override
-  public DependencyGroups<DeserializationStepInstance<?>> getDependencyGroups() {
+  public DependencyGroups<StepInstance<TInput, ?>> getDependencyGroups() {
     return new DependencyGroups<>(Stream.of(managed, unmanaged));
   }
 

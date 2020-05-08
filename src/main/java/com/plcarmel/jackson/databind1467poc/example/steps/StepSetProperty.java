@@ -1,25 +1,22 @@
 package com.plcarmel.jackson.databind1467poc.example.steps;
 
-import com.plcarmel.jackson.databind1467poc.example.groups.*;
+import com.plcarmel.jackson.databind1467poc.generic.groups.*;
 import com.plcarmel.jackson.databind1467poc.example.instances.InstanceSetProperty;
-import com.plcarmel.jackson.databind1467poc.theory.DeserializationStep;
-import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
-import com.plcarmel.jackson.databind1467poc.theory.NoData;
-import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;
+import com.plcarmel.jackson.databind1467poc.theory.*;
 
 import java.util.stream.Stream;
 
-public class StepSetProperty<TClass, TProperty>
-  implements DeserializationStep<NoData>, GetDependenciesMixin<DeserializationStep<?>>
+public class StepSetProperty<TInput, TClass, TProperty>
+  implements Step<TInput, NoData>, GetDependenciesMixin<Step<TInput, ?>>
 {
   private final PropertyConfiguration<? extends TProperty> propertyConfiguration;
-  private final StepGroupTwo<TClass, ? extends TProperty> managed;
-  private final StepGroupMany unmanaged;
+  private final StepGroupTwo<TInput, TClass, ? extends TProperty> managed;
+  private final StepGroupMany<TInput> unmanaged;
 
   public StepSetProperty(
     PropertyConfiguration<? extends TProperty> propertyConfiguration,
-    StepGroupTwo<TClass, ? extends TProperty> managed,
-    StepGroupMany unmanaged
+    StepGroupTwo<TInput, TClass, ? extends TProperty> managed,
+    StepGroupMany<TInput> unmanaged
   ) {
     this.propertyConfiguration = propertyConfiguration;
     this.managed = managed;
@@ -27,8 +24,8 @@ public class StepSetProperty<TClass, TProperty>
   }
 
   @Override
-  public DeserializationStepInstance<NoData> instantiated(DeserializationStep.InstanceFactory factory) {
-    return new InstanceSetProperty<TClass, TProperty>(
+  public StepInstance<TInput, NoData> instantiated(InstanceFactory<TInput> factory) {
+    return new InstanceSetProperty<>(
       propertyConfiguration,
       managed.instantiated(factory),
       unmanaged.instantiated(factory)
@@ -36,7 +33,7 @@ public class StepSetProperty<TClass, TProperty>
   }
 
   @Override
-  public DependencyGroups<DeserializationStep<?>> getDependencyGroups() {
+  public DependencyGroups<Step<TInput, ?>> getDependencyGroups() {
     return new DependencyGroups<>(Stream.of(managed, unmanaged));
   }
 }

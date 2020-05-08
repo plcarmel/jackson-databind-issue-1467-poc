@@ -1,22 +1,22 @@
 package com.plcarmel.jackson.databind1467poc.example.builders;
 
-import com.plcarmel.jackson.databind1467poc.theory.DeserializationStep;
-import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepBuilder;
+import com.plcarmel.jackson.databind1467poc.theory.Step;
+import com.plcarmel.jackson.databind1467poc.theory.StepBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BuilderHavingUnmanagedDependencies<T> implements DeserializationStepBuilder<T> {
+public abstract class BuilderHavingUnmanagedDependencies<TInput, TResult> implements StepBuilder<TInput, TResult> {
 
-  private final List<DeserializationStep<?>> dependencies = new ArrayList<>();
+  private final List<Step<TInput, ?>> dependencies = new ArrayList<>();
 
   @Override
-  public void addDependency(DeserializationStep<?> dependency) {
+  public void addDependency(Step<TInput, ?> dependency) {
     dependencies.add(dependency);
   }
 
   @Override
-  public List<DeserializationStep<?>> getDependencies() {
+  public List<Step<TInput, ?>> getDependencies() {
     return dependencies;
   }
 }
