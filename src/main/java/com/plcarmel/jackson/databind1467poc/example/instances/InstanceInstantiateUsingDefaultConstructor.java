@@ -1,22 +1,28 @@
 package com.plcarmel.jackson.databind1467poc.example.instances;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.plcarmel.jackson.databind1467poc.example.groups.DependencyGroups;
+import com.plcarmel.jackson.databind1467poc.example.groups.GetDependenciesMixin;
+import com.plcarmel.jackson.databind1467poc.example.groups.InstanceGroupMany;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.TypeConfiguration;
 
-import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
-public final class InstanceInstantiateUsingDefaultConstructor<T> extends InstanceHavingUnmanagedDependencies<T> {
+public final class InstanceInstantiateUsingDefaultConstructor<T>
+  extends InstanceHavingUnmanagedDependencies<T>
+  implements GetDependenciesMixin<DeserializationStepInstance<?>>
+{
 
   private final Class<T> typeClass;
   private T data;
 
   public InstanceInstantiateUsingDefaultConstructor(
     TypeConfiguration<T> typeConfiguration,
-    List<DeserializationStepInstance<?>> dependencies
+    InstanceGroupMany unmanaged
   ) {
-    super(dependencies);
+    super(unmanaged);
     typeClass = typeConfiguration.getTypeClass();
   }
 
@@ -33,6 +39,11 @@ public final class InstanceInstantiateUsingDefaultConstructor<T> extends Instanc
   @Override
   public boolean isOptional() {
     return false;
+  }
+
+  @Override
+  public boolean areDependenciesSatisfied() {
+    return unmanaged == null || unmanaged.areDependenciesSatisfied();
   }
 
   @Override
@@ -57,4 +68,8 @@ public final class InstanceInstantiateUsingDefaultConstructor<T> extends Instanc
     super.prune(onRemoved);
   }
 
+  @Override
+  public DependencyGroups<DeserializationStepInstance<?>> getDependencyGroups() {
+    return new DependencyGroups<>(Stream.of(unmanaged));
+  }
 }

@@ -3,27 +3,33 @@ package com.plcarmel.jackson.databind1467poc.example.instances;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import com.plcarmel.jackson.databind1467poc.example.groups.DependencyGroups;
+import com.plcarmel.jackson.databind1467poc.example.groups.GetDependenciesMixin;
+import com.plcarmel.jackson.databind1467poc.example.groups.InstanceGroupMany;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
+import com.plcarmel.jackson.databind1467poc.theory.NoData;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 
-public final class InstanceExpectToken extends InstanceNoData {
-
+public final class InstanceExpectToken extends InstanceHavingUnmanagedDependencies<NoData>
+  implements GetDependenciesMixin<DeserializationStepInstance<?>>, NoDataMixin
+{
   private final JsonToken expectedTokenKind;
   private final Object expectedTokenValue;
   private final boolean useTokenValue;
 
-  private boolean isDone = false;
+  private boolean tokenReceived = false;
 
   public InstanceExpectToken(
     JsonToken expectedTokenKind,
     Object expectedTokenValue,
-    List<DeserializationStepInstance<?>> dependencies
+    InstanceGroupMany unmanaged
   ) {
-    super(dependencies);
+    super(unmanaged);
     this.expectedTokenKind = expectedTokenKind;
     this.expectedTokenValue = expectedTokenValue;
     useTokenValue = true;
@@ -31,9 +37,9 @@ public final class InstanceExpectToken extends InstanceNoData {
 
   public InstanceExpectToken(
     JsonToken expectedTokenKind,
-    List<DeserializationStepInstance<?>> dependencies
+    InstanceGroupMany unmanaged
   ) {
-    super(dependencies);
+    super(unmanaged);
     this.expectedTokenKind = expectedTokenKind;
     this.expectedTokenValue = null;
     useTokenValue = false;
@@ -54,7 +60,7 @@ public final class InstanceExpectToken extends InstanceNoData {
     if (parser.currentToken() != expectedTokenKind)
       throw new JsonParseException(parser, "Was expecting token " + parser.currentToken());
     parser.nextToken();
-    isDone = true;
+    tokenReceived = true;
   }
 
   @Override
@@ -63,13 +69,22 @@ public final class InstanceExpectToken extends InstanceNoData {
   }
 
   @Override
+  public boolean areDependenciesSatisfied() {
+    return unmanaged == null || unmanaged.areDependenciesSatisfied();
+  }
+
+  @Override
   public boolean isDone() {
-    return isDone;
+    return tokenReceived && areDependenciesSatisfied();
+  }
+
+  @Override
+  public DependencyGroups<DeserializationStepInstance<?>> getDependencyGroups() {
+    return new DependencyGroups<>(Stream.of(unmanaged));
   }
 
   @Override
   public List<DeserializationStepInstance<?>> getDependencies() {
     return emptyList();
   }
-
 }

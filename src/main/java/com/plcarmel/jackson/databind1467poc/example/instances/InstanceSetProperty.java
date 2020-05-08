@@ -10,26 +10,24 @@ import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.NoData;
 import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;
 
-import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class InstanceSetProperty<TClass, TProperty>
-  extends InstanceBase<NoData>
-  implements GetDependenciesMixin<DeserializationStepInstance<?>>
+  extends InstanceHavingUnmanagedDependencies<NoData>
+  implements GetDependenciesMixin<DeserializationStepInstance<?>>, NoDataMixin
 {
   private final PropertyConfiguration<? extends TProperty> propertyConfiguration;
   private InstanceGroupTwo<TClass, ? extends TProperty> managed;
-  private InstanceGroupMany unmanaged;
 
   public InstanceSetProperty(
     PropertyConfiguration<? extends TProperty> propertyConfiguration,
     InstanceGroupTwo<TClass, ? extends TProperty> managed,
     InstanceGroupMany unmanaged
   ) {
+    super(unmanaged);
     this.propertyConfiguration = propertyConfiguration;
     this.managed = managed;
-    this.unmanaged = unmanaged;
   }
 
   @Override
@@ -54,7 +52,8 @@ public class InstanceSetProperty<TClass, TProperty>
 
   @Override
   public boolean areDependenciesSatisfied() {
-    return getDependencies().stream().allMatch(DeserializationStepInstance::areDependenciesSatisfied);
+    return (managed == null || managed.areDependenciesSatisfied())
+      && (unmanaged == null || unmanaged.areDependenciesSatisfied());
   }
 
   @Override
@@ -79,7 +78,7 @@ public class InstanceSetProperty<TClass, TProperty>
   }
 
   @Override
-  public void prune(Consumer<DeserializationStepInstance<?>> onRemoved) {
+  public void prune(Consumer<DeserializationStepInstance<?>> onDependencyRemoved) {
     if (managed != null) {
       managed.prune(
         () -> {
@@ -90,22 +89,11 @@ public class InstanceSetProperty<TClass, TProperty>
           managed = null;
           return true;
         },
-        onRemoved,
+        onDependencyRemoved,
         this
       );
     }
-    if (unmanaged != null) {
-      unmanaged.prune(() -> true, onRemoved, this);
-      if (unmanaged.isDone()) unmanaged = null;
-    }
-    if (isDone()) {
-      new ArrayList<>(getParents()).forEach(p -> p.prune(onRemoved));
-    }
-  }
-
-  @Override
-  public NoData getData() {
-    throw new RuntimeException(String.format("%s.%s should not be called", getClass().getSimpleName(), "getData"));
+    super.prune(onDependencyRemoved);
   }
 }
 

@@ -2,8 +2,10 @@ package com.plcarmel.jackson.databind1467poc.example.instances;
 
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public abstract class InstanceBase<T> implements DeserializationStepInstance<T> {
 
@@ -27,5 +29,12 @@ public abstract class InstanceBase<T> implements DeserializationStepInstance<T> 
   @Override
   public void complete() {
     getDependencies().forEach(DeserializationStepInstance::complete);
+  }
+
+  @Override
+  public void prune(Consumer<DeserializationStepInstance<?>> onDependencyRemoved) {
+    if (isDone()) {
+      new ArrayList<>(getParents()).forEach(p -> p.prune(onDependencyRemoved));
+    }
   }
 }

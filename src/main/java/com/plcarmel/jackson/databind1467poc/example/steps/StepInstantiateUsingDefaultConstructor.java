@@ -23,7 +23,7 @@ public class StepInstantiateUsingDefaultConstructor<T>
 
   @Override
   public DeserializationStepInstance<T> instantiated(InstanceFactory factory) {
-    return new InstanceInstantiateUsingDefaultConstructor<>(conf, unmanaged.instantiated(factory).getDependencies() /* tmp */);
+    return new InstanceInstantiateUsingDefaultConstructor<>(conf, unmanaged.instantiated(factory));
   }
 
   @Override

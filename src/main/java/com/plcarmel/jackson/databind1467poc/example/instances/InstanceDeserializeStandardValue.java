@@ -12,25 +12,23 @@ import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static com.fasterxml.jackson.core.JsonToken.VALUE_TRUE;
 
 public final class InstanceDeserializeStandardValue<T>
-  extends InstanceBase<T>
+  extends InstanceHavingUnmanagedDependencies<T>
   implements GetDependenciesMixin<DeserializationStepInstance<?>>
 {
   private final PropertyConfiguration<T> conf;
-  private InstanceGroupMany unmanaged;
   private T data;
-  private boolean isPropertyRead = false;
+  private boolean isPropertyDeserialized = false;
 
   public InstanceDeserializeStandardValue(
     PropertyConfiguration<T> conf,
     InstanceGroupMany unmanaged
   ) {
-    this.unmanaged = unmanaged;
+    super(unmanaged);
     this.conf = conf;
   }
 
@@ -52,7 +50,7 @@ public final class InstanceDeserializeStandardValue<T>
       case VALUE_NULL:
         if (conf.isRequired()) throw new JsonParseException(parser, "Value is required");
         data = null;
-        isPropertyRead = true;
+        isPropertyDeserialized = true;
         parser.nextToken();
         break;
       case VALUE_FALSE:
@@ -68,7 +66,7 @@ public final class InstanceDeserializeStandardValue<T>
         if (classes == null) throw notTheAppropriateType;
         //noinspection unchecked
         data = (T) SupportedTypes.typeToValueParser.get(typeClass).apply(parser);
-        isPropertyRead = true;
+        isPropertyDeserialized = true;
         parser.nextToken();
         break;
       default:
@@ -83,23 +81,12 @@ public final class InstanceDeserializeStandardValue<T>
 
   @Override
   public boolean areDependenciesSatisfied() {
-    return getDependencies().stream().allMatch(DeserializationStepInstance::areDependenciesSatisfied);
+    return unmanaged == null || unmanaged.areDependenciesSatisfied();
   }
 
   @Override
   public boolean isDone() {
-    return isPropertyRead && areDependenciesSatisfied();
-  }
-
-  @Override
-  public void prune(Consumer<DeserializationStepInstance<?>> onDependencyRemoved) {
-    if (unmanaged != null) {
-      unmanaged.prune(() -> true, onDependencyRemoved, this);
-      if (unmanaged.isDone()) unmanaged = null;
-    }
-    if (isDone()) {
-      new ArrayList<>(getParents()).forEach(p -> p.prune(onDependencyRemoved));
-    }
+    return isPropertyDeserialized && areDependenciesSatisfied();
   }
 
   @Override

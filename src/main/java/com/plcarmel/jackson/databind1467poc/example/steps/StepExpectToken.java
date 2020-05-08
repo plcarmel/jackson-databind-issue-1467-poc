@@ -44,11 +44,11 @@ public class StepExpectToken
       ? new InstanceExpectToken(
         expectedTokenKind,
         expectedTokenValue,
-        unmanagedDependencies.instantiated(factory).getDependencies() // tmp
+        unmanagedDependencies.instantiated(factory)
       )
       : new InstanceExpectToken(
         expectedTokenKind,
-        unmanagedDependencies.instantiated(factory).getDependencies() // tmp
+        unmanagedDependencies.instantiated(factory)
       );
   }
 

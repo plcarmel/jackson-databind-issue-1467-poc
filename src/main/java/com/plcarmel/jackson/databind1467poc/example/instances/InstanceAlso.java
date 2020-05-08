@@ -7,23 +7,22 @@ import com.plcarmel.jackson.databind1467poc.example.groups.InstanceGroupMany;
 import com.plcarmel.jackson.databind1467poc.example.groups.InstanceGroupOne;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
 
-import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public final class InstanceAlso<T> extends InstanceBase<T>
-  implements DeserializationStepInstance<T>, GetDependenciesMixin<DeserializationStepInstance<?>> {
-
+public final class InstanceAlso<T>
+  extends InstanceHavingUnmanagedDependencies<T>
+  implements GetDependenciesMixin<DeserializationStepInstance<?>>
+{
   private InstanceGroupOne<T> managed;
-  private InstanceGroupMany unmanaged;
   private T data;
 
   public InstanceAlso(
     InstanceGroupOne<T> managed,
     InstanceGroupMany unmanaged
   ) {
+    super(unmanaged);
     this.managed = managed;
-    this.unmanaged = unmanaged;
   }
 
   @Override
@@ -43,7 +42,8 @@ public final class InstanceAlso<T> extends InstanceBase<T>
 
   @Override
   public boolean areDependenciesSatisfied() {
-    return getDependencies().stream().allMatch(d -> d.isOptional() || d.areDependenciesSatisfied());
+    return (managed == null || managed.areDependenciesSatisfied()) &&
+      (unmanaged == null || unmanaged.areDependenciesSatisfied());
   }
 
   @Override
@@ -56,23 +56,22 @@ public final class InstanceAlso<T> extends InstanceBase<T>
     return managed == null && (unmanaged == null || unmanaged.areDependenciesSatisfied());
   }
 
+  private void execute() {
+    data = managed.getMain().getData();
+  }
+
   @Override
   public void prune(Consumer<DeserializationStepInstance<?>> onDependencyRemoved) {
     if (managed != null) {
-      managed.prune(() -> { data = managed.getMain().getData(); return true; }, onDependencyRemoved, this);
+      managed.prune(() -> { execute(); return true; }, onDependencyRemoved, this);
       if (managed.isDone()) managed = null;
     }
-    if (unmanaged != null) {
-      unmanaged.prune(() -> true, onDependencyRemoved, this);
-      if (unmanaged.isDone()) unmanaged = null;
-    }
-    if (isDone()) {
-      new ArrayList<>(getParents()).forEach(p -> p.prune(onDependencyRemoved));
-    }
+    super.prune(onDependencyRemoved);
   }
 
   @Override
   public DependencyGroups<DeserializationStepInstance<?>> getDependencyGroups() {
     return new DependencyGroups<>(Stream.of(managed, unmanaged));
   }
+
 }
