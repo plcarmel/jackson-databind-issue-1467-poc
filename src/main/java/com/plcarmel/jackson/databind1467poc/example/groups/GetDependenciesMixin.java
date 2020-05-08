@@ -4,7 +4,7 @@ import com.plcarmel.jackson.databind1467poc.theory.HasDependencies;
 
 import java.util.List;
 
-public interface HasDependencyGroupsMixin<TDep extends HasDependencies<TDep>> extends HasDependencies<TDep> {
+public interface GetDependenciesMixin<TDep extends HasDependencies<TDep>> extends HasDependencies<TDep> {
 
   DependencyGroups<TDep> getDependencyGroups();
 

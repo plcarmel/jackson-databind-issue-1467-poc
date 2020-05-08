@@ -2,39 +2,39 @@ package com.plcarmel.jackson.databind1467poc.example.instances;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.plcarmel.jackson.databind1467poc.example.configuration.FieldPropertyConfiguration;
+import com.plcarmel.jackson.databind1467poc.example.groups.DependencyGroups;
+import com.plcarmel.jackson.databind1467poc.example.groups.GetDependenciesMixin;
+import com.plcarmel.jackson.databind1467poc.example.groups.InstanceGroupMany;
+import com.plcarmel.jackson.databind1467poc.example.groups.InstanceGroupTwo;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
+import com.plcarmel.jackson.databind1467poc.theory.NoData;
 import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
-
-public class InstanceSetProperty<TClass, TProperty> extends InstanceNoData {
-
+public class InstanceSetProperty<TClass, TProperty>
+  extends InstanceBase<NoData>
+  implements GetDependenciesMixin<DeserializationStepInstance<?>>
+{
   private final PropertyConfiguration<? extends TProperty> propertyConfiguration;
-  private DeserializationStepInstance<TClass> instantiationStep;
-  private DeserializationStepInstance<? extends TProperty> propertyDeserializationStepInstance;
+  private InstanceGroupTwo<TClass, ? extends TProperty> managed;
+  private InstanceGroupMany unmanaged;
 
   public InstanceSetProperty(
     PropertyConfiguration<? extends TProperty> propertyConfiguration,
-    DeserializationStepInstance<TClass> instantiationStep,
-    DeserializationStepInstance<? extends TProperty> propertyDeserializationStepInstance,
-    List<DeserializationStepInstance<?>> otherDependencies
+    InstanceGroupTwo<TClass, ? extends TProperty> managed,
+    InstanceGroupMany unmanaged
   ) {
-    super(otherDependencies);
     this.propertyConfiguration = propertyConfiguration;
-    this.instantiationStep = instantiationStep;
-    this.propertyDeserializationStepInstance = propertyDeserializationStepInstance;
+    this.managed = managed;
+    this.unmanaged = unmanaged;
   }
 
   @Override
-  public List<DeserializationStepInstance<?>> getDependencies() {
-    return Stream.of(
-      super.getDependencies().stream(),
-      Stream.of(instantiationStep, propertyDeserializationStepInstance)
-    ).flatMap(s -> s) .collect(toList());
+  public DependencyGroups<DeserializationStepInstance<?>> getDependencyGroups() {
+    return new DependencyGroups<>(Stream.of(managed, unmanaged));
   }
 
   @Override
@@ -54,40 +54,61 @@ public class InstanceSetProperty<TClass, TProperty> extends InstanceNoData {
 
   @Override
   public boolean areDependenciesSatisfied() {
-    return instantiationStep.areDependenciesSatisfied() &&
-      propertyDeserializationStepInstance.areDependenciesSatisfied() &&
-      super.areDependenciesSatisfied();
+    return getDependencies().stream().allMatch(DeserializationStepInstance::areDependenciesSatisfied);
   }
 
   @Override
   public boolean isDone() {
-    return instantiationStep == null && propertyDeserializationStepInstance == null && super.areDependenciesSatisfied();
+    return managed == null &&
+      ( unmanaged == null ||
+        unmanaged.getDependencies().stream().allMatch(DeserializationStepInstance::areDependenciesSatisfied)
+      );
+  }
+
+  private void execute() {
+    if (propertyConfiguration instanceof FieldPropertyConfiguration) {
+      //noinspection unchecked
+      final FieldPropertyConfiguration<TClass, TProperty> fpc =
+        (FieldPropertyConfiguration<TClass, TProperty>) propertyConfiguration;
+      try {
+        fpc.getField().set(managed.getFirst().getData(), managed.getSecond().getData());
+      } catch (IllegalAccessException e) {
+        throw new RuntimeException(e);
+      }
+    }
   }
 
   @Override
   public void prune(Consumer<DeserializationStepInstance<?>> onRemoved) {
-    if (
-      instantiationStep != null &&
-      propertyDeserializationStepInstance != null &&
-      instantiationStep.isDone() &&
-      propertyDeserializationStepInstance.isDone()
-    ) {
-      if (propertyConfiguration instanceof FieldPropertyConfiguration) {
-        //noinspection unchecked
-        FieldPropertyConfiguration<TClass, TProperty> fpc =
-          (FieldPropertyConfiguration<TClass, TProperty>) propertyConfiguration;
-        try {
-          fpc.getField().set(instantiationStep.getData(), propertyDeserializationStepInstance.getData());
-        } catch (IllegalAccessException e) {
-          throw new RuntimeException(e);
-        }
-      }
-      onRemoved.accept(instantiationStep);
-      instantiationStep = null;
-      onRemoved.accept(propertyDeserializationStepInstance);
-      propertyDeserializationStepInstance = null;
+    if (managed != null) {
+      managed.prune(
+        () -> {
+          if (!managed.getFirst().isDone() || !managed.getSecond().isDone()) {
+            return false;
+          }
+          execute();
+          managed = null;
+          unmanaged = null;
+          return true;
+        },
+        onRemoved,
+        this
+      );
     }
-    super.prune(onRemoved);
+    if (unmanaged != null) {
+      unmanaged.prune(() -> true, onRemoved, this);
+      if (unmanaged.getDependencies().stream().allMatch(DeserializationStepInstance::isDone)) {
+        unmanaged = null;
+      }
+    }
+    if (isDone()) {
+      new ArrayList<>(getParents()).forEach(p -> p.prune(onRemoved));
+    }
+  }
+
+  @Override
+  public NoData getData() {
+    throw new RuntimeException(String.format("%s.%s should not be called", getClass().getSimpleName(), "getData"));
   }
 }
 

@@ -6,8 +6,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 public interface DeserializationStepInstance<T>
-  extends HasDependencies<DeserializationStepInstance<?>>, AsynchronousDeserialization<T>
-{
+
+  extends HasDependencies<DeserializationStepInstance<?>>, AsynchronousDeserialization<T> {
   boolean isOptional();
   boolean isDone();
   boolean areDependenciesSatisfied();
@@ -17,8 +17,7 @@ public interface DeserializationStepInstance<T>
   void addParent(DeserializationStepInstance<?> parent);
   void removeParent(DeserializationStepInstance<?> parent);
 
-  void prune(Consumer<DeserializationStepInstance<?>> onRemoved);
-
+  void prune(Consumer<DeserializationStepInstance<?>> onDependencyRemoved);
   void complete();
 
   default void setTreeParents(Set<DeserializationStepInstance<?>> alreadyVisited) {
@@ -31,4 +30,5 @@ public interface DeserializationStepInstance<T>
   default void setTreeParents() {
     setTreeParents(new HashSet<>());
   }
+
 }

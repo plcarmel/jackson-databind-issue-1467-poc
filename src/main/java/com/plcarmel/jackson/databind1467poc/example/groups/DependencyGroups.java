@@ -3,6 +3,7 @@ package com.plcarmel.jackson.databind1467poc.example.groups;
 import com.plcarmel.jackson.databind1467poc.theory.HasDependencies;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -12,7 +13,7 @@ public class DependencyGroups<TDep extends HasDependencies<TDep>> implements Has
   private final List<HasDependencies<TDep>> groups;
 
   public DependencyGroups(Stream<HasDependencies<TDep>> groups) {
-    this.groups = groups.collect(toList());
+    this.groups = groups.filter(Objects::nonNull).collect(toList());
   }
 
   @Override

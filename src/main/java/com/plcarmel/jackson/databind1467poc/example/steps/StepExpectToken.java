@@ -2,19 +2,15 @@ package com.plcarmel.jackson.databind1467poc.example.steps;
 
 import com.fasterxml.jackson.core.JsonToken;
 import com.plcarmel.jackson.databind1467poc.example.groups.DependencyGroups;
-import com.plcarmel.jackson.databind1467poc.example.groups.HasDependencyGroupsMixin;
+import com.plcarmel.jackson.databind1467poc.example.groups.GetDependenciesMixin;
 import com.plcarmel.jackson.databind1467poc.example.groups.StepGroupMany;
 import com.plcarmel.jackson.databind1467poc.example.instances.InstanceExpectToken;
-import com.plcarmel.jackson.databind1467poc.example.groups.GroupMany;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStep;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.NoData;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class StepExpectToken
-  implements DeserializationStep<NoData>, HasDependencyGroupsMixin<DeserializationStep<?>>
+  implements DeserializationStep<NoData>, GetDependenciesMixin<DeserializationStep<?>>
 {
   private final JsonToken expectedTokenKind;
   private final Object expectedTokenValue;
@@ -48,11 +44,11 @@ public class StepExpectToken
       ? new InstanceExpectToken(
         expectedTokenKind,
         expectedTokenValue,
-        unmanagedDependencies.instantiated(factory)
+        unmanagedDependencies.instantiated(factory).getDependencies() // tmp
       )
       : new InstanceExpectToken(
         expectedTokenKind,
-        unmanagedDependencies.instantiated(factory)
+        unmanagedDependencies.instantiated(factory).getDependencies() // tmp
       );
   }
 

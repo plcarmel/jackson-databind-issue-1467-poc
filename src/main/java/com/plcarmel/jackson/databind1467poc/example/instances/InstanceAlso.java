@@ -1,25 +1,29 @@
 package com.plcarmel.jackson.databind1467poc.example.instances;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.plcarmel.jackson.databind1467poc.example.groups.DependencyGroups;
+import com.plcarmel.jackson.databind1467poc.example.groups.GetDependenciesMixin;
+import com.plcarmel.jackson.databind1467poc.example.groups.InstanceGroupMany;
+import com.plcarmel.jackson.databind1467poc.example.groups.InstanceGroupOne;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
+public final class InstanceAlso<T> extends InstanceBase<T>
+  implements DeserializationStepInstance<T>, GetDependenciesMixin<DeserializationStepInstance<?>> {
 
-public final class InstanceAlso<T> extends InstanceHavingUnmanagedDependencies<T> {
-
-  private DeserializationStepInstance<T> mainDependency;
+  private InstanceGroupOne<T> managed;
+  private InstanceGroupMany unmanaged;
   private T data;
 
   public InstanceAlso(
-    DeserializationStepInstance<T> mainDependency,
-    List<DeserializationStepInstance<?>> otherDependencies
+    InstanceGroupOne<T> managed,
+    InstanceGroupMany unmanaged
   ) {
-    super(otherDependencies);
-    this.mainDependency = mainDependency;
+    this.managed = managed;
+    this.unmanaged = unmanaged;
   }
 
   @Override
@@ -39,8 +43,7 @@ public final class InstanceAlso<T> extends InstanceHavingUnmanagedDependencies<T
 
   @Override
   public boolean areDependenciesSatisfied() {
-    return (mainDependency == null || mainDependency.isOptional()) &&
-      super.areDependenciesSatisfied();
+    return getDependencies().stream().allMatch(d -> d.isOptional() || d.areDependenciesSatisfied());
   }
 
   @Override
@@ -50,24 +53,33 @@ public final class InstanceAlso<T> extends InstanceHavingUnmanagedDependencies<T
 
   @Override
   public boolean isDone() {
-    return mainDependency == null && super.areDependenciesSatisfied();
+    return managed == null &&
+      ( unmanaged == null ||
+        unmanaged.getDependencies().stream().allMatch(d -> d.isOptional() || d.areDependenciesSatisfied())
+      );
   }
 
   @Override
   public void prune(Consumer<DeserializationStepInstance<?>> onRemoved) {
-    if (mainDependency != null && mainDependency.isDone()) {
-      data = mainDependency.getData();
-      mainDependency.removeParent(this);
-      onRemoved.accept(mainDependency);
-      mainDependency = null;
+    if (managed != null) {
+      managed.prune(() -> { data = managed.getMain().getData(); return true; }, onRemoved, this);
+      if (managed.getDependencies().stream().allMatch(DeserializationStepInstance::isDone)) {
+        managed = null;
+      }
     }
-    super.prune(onRemoved);
+    if (unmanaged != null) {
+      unmanaged.prune(() -> true, onRemoved, this);
+      if (unmanaged.getDependencies().stream().allMatch(DeserializationStepInstance::isDone)) {
+        unmanaged = null;
+      }
+    }
+    if (isDone()) {
+      new ArrayList<>(getParents()).forEach(p -> p.prune(onRemoved));
+    }
   }
 
   @Override
-  public List<DeserializationStepInstance<?>> getDependencies() {
-    Stream<DeserializationStepInstance<?>> s1 = mainDependency != null ? Stream.of(mainDependency) : Stream.empty();
-    Stream<DeserializationStepInstance<?>> s2 = super.getDependencies().stream();
-    return Stream.of(s1, s2).flatMap(l -> l).collect(toList());
+  public DependencyGroups<DeserializationStepInstance<?>> getDependencyGroups() {
+    return new DependencyGroups<>(Stream.of(managed, unmanaged));
   }
 }

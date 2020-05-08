@@ -8,7 +8,7 @@ import java.util.List;
 public class GroupOne<TMain extends TDep, TDep extends HasDependencies<TDep>>
   implements HasDependencies<TDep>
 {
-  private final TMain main;
+  protected TMain main;
 
   public TMain getMain() {
     return main;
@@ -20,6 +20,6 @@ public class GroupOne<TMain extends TDep, TDep extends HasDependencies<TDep>>
 
   @Override
   public List<TDep> getDependencies() {
-    return Collections.singletonList(main);
+    return main == null ? Collections.emptyList() : Collections.singletonList(main);
   }
 }

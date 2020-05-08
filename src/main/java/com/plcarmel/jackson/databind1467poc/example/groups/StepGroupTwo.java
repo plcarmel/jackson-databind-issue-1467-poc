@@ -1,7 +1,6 @@
 package com.plcarmel.jackson.databind1467poc.example.groups;
 
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStep;
-import com.plcarmel.jackson.databind1467poc.theory.DeserializationStepInstance;
 
 public class StepGroupTwo<TFirst, TSecond>
   extends GroupTwo<
@@ -14,11 +13,7 @@ public class StepGroupTwo<TFirst, TSecond>
     super(first, second);
   }
 
-  public DeserializationStepInstance<TFirst> instantiatedFirst(DeserializationStep.InstanceFactory factory) {
-    return factory.instantiate(getFirst());
-  }
-
-  public DeserializationStepInstance<TSecond> instantiatedSecond(DeserializationStep.InstanceFactory factory) {
-    return factory.instantiate(getSecond());
+  public InstanceGroupTwo<TFirst, ? extends TSecond> instantiated(DeserializationStep.InstanceFactory factory) {
+    return new InstanceGroupTwo<>(factory.instantiate(getFirst()), factory.instantiate(getSecond()));
   }
 }

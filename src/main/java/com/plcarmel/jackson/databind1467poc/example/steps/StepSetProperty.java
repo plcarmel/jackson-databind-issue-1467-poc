@@ -10,7 +10,7 @@ import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;
 import java.util.stream.Stream;
 
 public class StepSetProperty<TClass, TProperty>
-  implements DeserializationStep<NoData>, HasDependencyGroupsMixin<DeserializationStep<?>>
+  implements DeserializationStep<NoData>, GetDependenciesMixin<DeserializationStep<?>>
 {
   private final PropertyConfiguration<? extends TProperty> propertyConfiguration;
   private final StepGroupTwo<TClass, ? extends TProperty> managed;
@@ -28,10 +28,9 @@ public class StepSetProperty<TClass, TProperty>
 
   @Override
   public DeserializationStepInstance<NoData> instantiated(DeserializationStep.InstanceFactory factory) {
-    return new InstanceSetProperty<>(
+    return new InstanceSetProperty<TClass, TProperty>(
       propertyConfiguration,
-      managed.instantiatedFirst(factory),
-      managed.instantiatedSecond(factory),
+      managed.instantiated(factory),
       unmanaged.instantiated(factory)
     );
   }

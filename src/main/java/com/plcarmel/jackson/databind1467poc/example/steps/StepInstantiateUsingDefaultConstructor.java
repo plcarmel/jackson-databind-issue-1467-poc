@@ -1,7 +1,7 @@
 package com.plcarmel.jackson.databind1467poc.example.steps;
 
 import com.plcarmel.jackson.databind1467poc.example.groups.DependencyGroups;
-import com.plcarmel.jackson.databind1467poc.example.groups.HasDependencyGroupsMixin;
+import com.plcarmel.jackson.databind1467poc.example.groups.GetDependenciesMixin;
 import com.plcarmel.jackson.databind1467poc.example.groups.StepGroupMany;
 import com.plcarmel.jackson.databind1467poc.example.instances.InstanceInstantiateUsingDefaultConstructor;
 import com.plcarmel.jackson.databind1467poc.theory.DeserializationStep;
@@ -11,7 +11,7 @@ import com.plcarmel.jackson.databind1467poc.theory.TypeConfiguration;
 import java.util.stream.Stream;
 
 public class StepInstantiateUsingDefaultConstructor<T>
-  implements DeserializationStep<T>, HasDependencyGroupsMixin<DeserializationStep<?>>
+  implements DeserializationStep<T>, GetDependenciesMixin<DeserializationStep<?>>
 {
   private final TypeConfiguration<T> conf;
   private final StepGroupMany unmanaged;
@@ -23,7 +23,7 @@ public class StepInstantiateUsingDefaultConstructor<T>
 
   @Override
   public DeserializationStepInstance<T> instantiated(InstanceFactory factory) {
-    return new InstanceInstantiateUsingDefaultConstructor<>(conf, unmanaged.instantiated(factory));
+    return new InstanceInstantiateUsingDefaultConstructor<>(conf, unmanaged.instantiated(factory).getDependencies() /* tmp */);
   }
 
   @Override

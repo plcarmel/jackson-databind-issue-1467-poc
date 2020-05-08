@@ -8,8 +8,8 @@ import java.util.List;
 public class GroupTwo<TFirst extends TDep, TSecond extends TDep, TDep extends HasDependencies<TDep>>
   implements HasDependencies<TDep>
 {
-  private final TFirst first;
-  private final TSecond second;
+  protected TFirst first;
+  protected TSecond second;
 
   public TFirst getFirst() {
     return first;
