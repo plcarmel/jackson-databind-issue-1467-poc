@@ -1,5 +1,6 @@
-package com.plcarmel.jackson.databind1467poc.generic.groups;
+package com.plcarmel.jackson.databind1467poc.generic.groups.instances;
 
+import com.plcarmel.jackson.databind1467poc.generic.groups.DependencyGroups;
 import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 
 import java.util.List;
@@ -19,19 +20,15 @@ public class InstanceDependencyGroups<TInput>
     return getGroups().stream().flatMap(g -> g.getDependencies().stream()).collect(toList());
   }
 
-  void removeDependencyFromList(StepInstance<TInput, ?> dependency) {
+  public void removeDependencyFromList(StepInstance<TInput, ?> dependency) {
     getGroups().forEach(g -> g.removeDependencyFromList(dependency));
   }
 
-  void clean(StepInstance<TInput, ?> stepInstance, Consumer<StepInstance<TInput, ?>> onDependencyRemoved) {
+  public void clean(StepInstance<TInput, ?> stepInstance, Consumer<StepInstance<TInput, ?>> onDependencyRemoved) {
     getGroups().forEach(g -> g.clean(stepInstance, onDependencyRemoved));
   }
 
-  boolean someManaged() {
-    return getGroups().stream().anyMatch(Group::isManaged);
-  }
-
-  boolean allDone() {
+  public boolean allDone() {
     return getGroups().stream().allMatch(InstanceGroup::allDone);
   }
 }

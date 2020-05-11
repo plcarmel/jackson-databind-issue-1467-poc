@@ -3,7 +3,7 @@ package com.plcarmel.jackson.databind1467poc.jackson;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.plcarmel.jackson.databind1467poc.generic.configuration.CachedTypeConfigurationFactory;
-import com.plcarmel.jackson.databind1467poc.jackson.builders.SimpleStepFactory;
+import com.plcarmel.jackson.databind1467poc.jackson.builders.JacksonStepFactory;
 import com.plcarmel.jackson.databind1467poc.theory.StepBuilder;
 import com.plcarmel.jackson.databind1467poc.theory.Interpreter;
 
@@ -13,7 +13,7 @@ public class ObjectMapper {
 
   public <T> T readValue(String content, Class<T> valueType) throws IOException {
     final StepBuilder<JsonParser, ? extends T> builder =
-      SimpleStepFactory
+      JacksonStepFactory
         .getInstance()
         .builderDeserializeBeanValue(CachedTypeConfigurationFactory.getInstance().getTypeConfiguration(valueType));
     final Interpreter<JsonParser, ? extends T> interpreter = new Interpreter<>(builder.build());

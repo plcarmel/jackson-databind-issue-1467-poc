@@ -1,6 +1,15 @@
 package com.plcarmel.jackson.databind1467poc.generic.instances;
 
-import com.plcarmel.jackson.databind1467poc.generic.groups.*;
+import com.plcarmel.jackson.databind1467poc.generic.groups.instances.InstanceDependencyGroups;
+import com.plcarmel.jackson.databind1467poc.generic.groups.instances.InstanceGroup;
+import com.plcarmel.jackson.databind1467poc.generic.groups.instances.InstanceGroupMany;
+import com.plcarmel.jackson.databind1467poc.generic.groups.instances.InstanceGroupOne;
+import com.plcarmel.jackson.databind1467poc.generic.groups.instances.mixins.CleanMixin;
+import com.plcarmel.jackson.databind1467poc.generic.groups.mixins.GetDependenciesMixin;
+import com.plcarmel.jackson.databind1467poc.generic.groups.instances.mixins.RemoveDependencyFromListMixin;
+import com.plcarmel.jackson.databind1467poc.generic.instances.mixins.NoDataMixin;
+import com.plcarmel.jackson.databind1467poc.generic.instances.mixins.NoTokenMixin;
+import com.plcarmel.jackson.databind1467poc.generic.instances.bases.InstanceUnmanagedBase;
 import com.plcarmel.jackson.databind1467poc.theory.SettablePropertyConfiguration;
 import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.NoData;
@@ -9,13 +18,13 @@ import java.util.stream.Stream;
 
 public final class InstanceSetProperty<TInput, TClass, TValue>
   extends
-    InstanceHavingUnmanagedDependencies<TInput, NoData>
+  InstanceUnmanagedBase<TInput, NoData>
   implements
-    GetDependenciesMixin<InstanceGroup<TInput>, StepInstance<TInput,?>>,
-    RemoveDependencyFromListMixin<TInput, NoData>,
+  GetDependenciesMixin<InstanceGroup<TInput>, StepInstance<TInput,?>>,
+  RemoveDependencyFromListMixin<TInput, NoData>,
   CleanMixin<TInput, NoData>,
-    NoDataMixin<TInput>,
-    NoTokenMixin<TInput, NoData>
+  NoDataMixin<TInput>,
+  NoTokenMixin<TInput, NoData>
 {
   private final SettablePropertyConfiguration<TClass, TValue> propertyConfiguration;
   private final InstanceGroupOne<TInput, ? extends TClass> instantiationStep;

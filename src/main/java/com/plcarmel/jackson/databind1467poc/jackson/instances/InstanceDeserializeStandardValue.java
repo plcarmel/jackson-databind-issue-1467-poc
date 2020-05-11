@@ -3,10 +3,15 @@ package com.plcarmel.jackson.databind1467poc.jackson.instances;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import com.plcarmel.jackson.databind1467poc.generic.groups.*;
-import com.plcarmel.jackson.databind1467poc.generic.instances.NonExecutableMixin;
+import com.plcarmel.jackson.databind1467poc.generic.groups.instances.InstanceDependencyGroups;
+import com.plcarmel.jackson.databind1467poc.generic.groups.instances.InstanceGroup;
+import com.plcarmel.jackson.databind1467poc.generic.groups.instances.InstanceGroupMany;
+import com.plcarmel.jackson.databind1467poc.generic.groups.instances.mixins.CleanMixin;
+import com.plcarmel.jackson.databind1467poc.generic.groups.mixins.GetDependenciesMixin;
+import com.plcarmel.jackson.databind1467poc.generic.groups.instances.mixins.RemoveDependencyFromListMixin;
+import com.plcarmel.jackson.databind1467poc.generic.instances.mixins.NonExecutableMixin;
 import com.plcarmel.jackson.databind1467poc.jackson.SupportedTypes;
-import com.plcarmel.jackson.databind1467poc.generic.instances.InstanceHavingUnmanagedDependencies;
+import com.plcarmel.jackson.databind1467poc.generic.instances.bases.InstanceUnmanagedBase;
 import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;
 
@@ -18,11 +23,11 @@ import static com.fasterxml.jackson.core.JsonToken.VALUE_TRUE;
 
 public final class InstanceDeserializeStandardValue<TResult>
   extends
-    InstanceHavingUnmanagedDependencies<JsonParser, TResult>
+  InstanceUnmanagedBase<JsonParser, TResult>
   implements
-    GetDependenciesMixin<InstanceGroup<JsonParser>, StepInstance<JsonParser, ?>>,
-    RemoveDependencyFromListMixin<JsonParser, TResult>,
-    CleanMixin<JsonParser, TResult>,
+  GetDependenciesMixin<InstanceGroup<JsonParser>, StepInstance<JsonParser, ?>>,
+  RemoveDependencyFromListMixin<JsonParser, TResult>,
+  CleanMixin<JsonParser, TResult>,
     NonExecutableMixin<JsonParser, TResult>
 {
   private final PropertyConfiguration<?, TResult> conf;

@@ -1,5 +1,7 @@
-package com.plcarmel.jackson.databind1467poc.generic.groups;
+package com.plcarmel.jackson.databind1467poc.generic.groups.steps;
 
+import com.plcarmel.jackson.databind1467poc.generic.groups.GroupMany;
+import com.plcarmel.jackson.databind1467poc.generic.groups.instances.InstanceGroupMany;
 import com.plcarmel.jackson.databind1467poc.theory.InstanceFactory;
 import com.plcarmel.jackson.databind1467poc.theory.Step;
 

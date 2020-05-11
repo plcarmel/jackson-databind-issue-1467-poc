@@ -1,11 +1,11 @@
-package com.plcarmel.jackson.databind1467poc.generic.instances;
+package com.plcarmel.jackson.databind1467poc.generic.instances.bases;
 
 import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class InstanceParentsImpl<TInput, TResult> implements StepInstance<TInput, TResult> {
+public abstract class InstanceParentsBase<TInput, TResult> implements StepInstance<TInput, TResult> {
 
   private final Set<StepInstance<TInput, ?>> parents = new HashSet<>();
 

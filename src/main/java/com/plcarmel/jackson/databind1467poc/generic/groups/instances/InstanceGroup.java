@@ -1,5 +1,6 @@
-package com.plcarmel.jackson.databind1467poc.generic.groups;
+package com.plcarmel.jackson.databind1467poc.generic.groups.instances;
 
+import com.plcarmel.jackson.databind1467poc.generic.groups.Group;
 import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 
 import java.util.ArrayList;

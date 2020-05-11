@@ -1,5 +1,6 @@
-package com.plcarmel.jackson.databind1467poc.generic.groups;
+package com.plcarmel.jackson.databind1467poc.generic.groups.mixins;
 
+import com.plcarmel.jackson.databind1467poc.generic.groups.DependencyGroups;
 import com.plcarmel.jackson.databind1467poc.theory.HasDependencies;
 
 import java.util.List;

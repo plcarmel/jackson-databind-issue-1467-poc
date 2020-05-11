@@ -3,10 +3,15 @@ package com.plcarmel.jackson.databind1467poc.jackson.instances;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import com.plcarmel.jackson.databind1467poc.generic.groups.*;
-import com.plcarmel.jackson.databind1467poc.generic.instances.InstanceHavingUnmanagedDependencies;
-import com.plcarmel.jackson.databind1467poc.generic.instances.NoDataMixin;
-import com.plcarmel.jackson.databind1467poc.generic.instances.NonExecutableMixin;
+import com.plcarmel.jackson.databind1467poc.generic.groups.instances.InstanceDependencyGroups;
+import com.plcarmel.jackson.databind1467poc.generic.groups.instances.InstanceGroup;
+import com.plcarmel.jackson.databind1467poc.generic.groups.instances.InstanceGroupMany;
+import com.plcarmel.jackson.databind1467poc.generic.groups.instances.mixins.CleanMixin;
+import com.plcarmel.jackson.databind1467poc.generic.groups.mixins.GetDependenciesMixin;
+import com.plcarmel.jackson.databind1467poc.generic.groups.instances.mixins.RemoveDependencyFromListMixin;
+import com.plcarmel.jackson.databind1467poc.generic.instances.bases.InstanceUnmanagedBase;
+import com.plcarmel.jackson.databind1467poc.generic.instances.mixins.NoDataMixin;
+import com.plcarmel.jackson.databind1467poc.generic.instances.mixins.NonExecutableMixin;
 import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.NoData;
 
@@ -15,10 +20,10 @@ import java.util.stream.Stream;
 
 public final class InstanceExpectToken
   extends
-    InstanceHavingUnmanagedDependencies<JsonParser, NoData>
+  InstanceUnmanagedBase<JsonParser, NoData>
   implements
-    GetDependenciesMixin<InstanceGroup<JsonParser>, StepInstance<JsonParser, ?>>,
-    RemoveDependencyFromListMixin<JsonParser, NoData>,
+  GetDependenciesMixin<InstanceGroup<JsonParser>, StepInstance<JsonParser, ?>>,
+  RemoveDependencyFromListMixin<JsonParser, NoData>,
   CleanMixin<JsonParser, NoData>,
     NoDataMixin<JsonParser>,
     NonExecutableMixin<JsonParser, NoData>

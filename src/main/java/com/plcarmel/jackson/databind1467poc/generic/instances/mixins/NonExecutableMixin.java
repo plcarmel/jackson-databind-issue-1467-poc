@@ -1,4 +1,4 @@
-package com.plcarmel.jackson.databind1467poc.generic.instances;
+package com.plcarmel.jackson.databind1467poc.generic.instances.mixins;
 
 import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 

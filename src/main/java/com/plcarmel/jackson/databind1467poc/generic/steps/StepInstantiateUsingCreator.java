@@ -1,9 +1,9 @@
 package com.plcarmel.jackson.databind1467poc.generic.steps;
 
 import com.plcarmel.jackson.databind1467poc.generic.groups.DependencyGroups;
-import com.plcarmel.jackson.databind1467poc.generic.groups.GetDependenciesMixin;
+import com.plcarmel.jackson.databind1467poc.generic.groups.mixins.GetDependenciesMixin;
 import com.plcarmel.jackson.databind1467poc.generic.groups.Group;
-import com.plcarmel.jackson.databind1467poc.generic.groups.StepGroupMany;
+import com.plcarmel.jackson.databind1467poc.generic.groups.steps.StepGroupMany;
 import com.plcarmel.jackson.databind1467poc.generic.instances.InstanceInstantiateUsingCreator;
 import com.plcarmel.jackson.databind1467poc.theory.CreatorConfiguration;
 import com.plcarmel.jackson.databind1467poc.theory.InstanceFactory;

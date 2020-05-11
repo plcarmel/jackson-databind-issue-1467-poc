@@ -10,7 +10,7 @@ import java.io.IOException;
 
 import static org.junit.Assert.*;
 
-public class BasicTest {
+public class AcceptanceTest {
 
   @Test
   public void emptyObjectTest() throws IOException {
@@ -86,5 +86,7 @@ public class BasicTest {
     assertNotNull(result);
     assertEquals(result.w, 1234);
   }
+
+
 
 }

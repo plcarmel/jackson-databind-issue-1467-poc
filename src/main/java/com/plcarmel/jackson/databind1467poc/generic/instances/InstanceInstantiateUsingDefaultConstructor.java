@@ -1,7 +1,8 @@
 package com.plcarmel.jackson.databind1467poc.generic.instances;
 
-import com.plcarmel.jackson.databind1467poc.generic.groups.InstanceDependencyGroups;
-import com.plcarmel.jackson.databind1467poc.generic.groups.InstanceGroupMany;
+import com.plcarmel.jackson.databind1467poc.generic.groups.instances.InstanceDependencyGroups;
+import com.plcarmel.jackson.databind1467poc.generic.groups.instances.InstanceGroupMany;
+import com.plcarmel.jackson.databind1467poc.generic.instances.bases.InstanceInstantiateBase;
 import com.plcarmel.jackson.databind1467poc.theory.TypeConfiguration;
 
 import java.util.stream.Stream;
