@@ -22,7 +22,7 @@ public final class InstanceDeserializeStandardValue<TResult>
   implements
     GetDependenciesMixin<InstanceGroup<JsonParser>, StepInstance<JsonParser, ?>>,
     RemoveDependencyFromListMixin<JsonParser, TResult>,
-    CollapseMixin<JsonParser, TResult>,
+    CleanMixin<JsonParser, TResult>,
     NonExecutableMixin<JsonParser, TResult>
 {
   private final PropertyConfiguration<?, TResult> conf;

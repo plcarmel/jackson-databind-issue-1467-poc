@@ -19,7 +19,7 @@ public final class InstanceExpectToken
   implements
     GetDependenciesMixin<InstanceGroup<JsonParser>, StepInstance<JsonParser, ?>>,
     RemoveDependencyFromListMixin<JsonParser, NoData>,
-    CollapseMixin<JsonParser, NoData>,
+  CleanMixin<JsonParser, NoData>,
     NoDataMixin<JsonParser>,
     NonExecutableMixin<JsonParser, NoData>
 {

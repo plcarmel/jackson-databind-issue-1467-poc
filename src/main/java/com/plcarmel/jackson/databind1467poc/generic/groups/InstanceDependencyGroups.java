@@ -23,8 +23,8 @@ public class InstanceDependencyGroups<TInput>
     getGroups().forEach(g -> g.removeDependencyFromList(dependency));
   }
 
-  void collapse(StepInstance<TInput, ?> stepInstance, Consumer<StepInstance<TInput, ?>> onDependencyRemoved) {
-    getGroups().forEach(g -> g.collapse(stepInstance, onDependencyRemoved));
+  void clean(StepInstance<TInput, ?> stepInstance, Consumer<StepInstance<TInput, ?>> onDependencyRemoved) {
+    getGroups().forEach(g -> g.clean(stepInstance, onDependencyRemoved));
   }
 
   boolean someManaged() {

@@ -12,7 +12,7 @@ public interface InstanceGroup<TInput> extends Group<StepInstance<TInput, ?>> {
   boolean anyDone();
   boolean allDone();
 
-  default void collapse(
+  default void clean(
     StepInstance<TInput, ?> stepInstance,
     Consumer<StepInstance<TInput, ?>> onDependencyRemoved
   ) {

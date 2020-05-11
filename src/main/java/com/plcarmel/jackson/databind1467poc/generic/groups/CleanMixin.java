@@ -5,13 +5,13 @@ import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
-public interface CollapseMixin<TInput, TResult>
+public interface CleanMixin<TInput, TResult>
   extends StepInstance<TInput, TResult>, HasInstanceDependencyGroups<TInput>
 {
   @Override
   default void clean(Consumer<StepInstance<TInput, ?>> onDependencyRemoved) {
     final InstanceDependencyGroups<TInput> groups = getDependencyGroups();
-    groups.collapse(this, onDependencyRemoved);
+    groups.clean(this, onDependencyRemoved);
     if (groups.allDone()) {
       new ArrayList<>(groups.getDependencies()).forEach(d -> {
         removeDependency(d);

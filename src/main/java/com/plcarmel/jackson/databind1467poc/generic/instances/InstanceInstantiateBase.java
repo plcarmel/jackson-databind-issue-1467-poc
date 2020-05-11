@@ -9,7 +9,7 @@ public abstract class InstanceInstantiateBase<TInput, TResult>
   implements
     GetDependenciesMixin<InstanceGroup<TInput>, StepInstance<TInput, ?>>,
     RemoveDependencyFromListMixin<TInput, TResult>,
-    CollapseMixin<TInput, TResult>,
+  CleanMixin<TInput, TResult>,
     NoTokenMixin<TInput, TResult>
 {
   protected TResult data;

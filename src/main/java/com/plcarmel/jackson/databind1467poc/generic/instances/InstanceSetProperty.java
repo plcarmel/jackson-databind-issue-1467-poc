@@ -13,7 +13,7 @@ public final class InstanceSetProperty<TInput, TClass, TValue>
   implements
     GetDependenciesMixin<InstanceGroup<TInput>, StepInstance<TInput,?>>,
     RemoveDependencyFromListMixin<TInput, NoData>,
-    CollapseMixin<TInput, NoData>,
+  CleanMixin<TInput, NoData>,
     NoDataMixin<TInput>,
     NoTokenMixin<TInput, NoData>
 {
