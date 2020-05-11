@@ -1,5 +1,7 @@
 package com.plcarmel.jackson.databind1467poc.generic.configuration;
 
+import com.plcarmel.jackson.databind1467poc.jackson.configuration.BeanTypeConfiguration;
+import com.plcarmel.jackson.databind1467poc.jackson.configuration.StandardTypeConfiguration;
 import com.plcarmel.jackson.databind1467poc.theory.TypeConfiguration;
 
 import java.util.HashMap;

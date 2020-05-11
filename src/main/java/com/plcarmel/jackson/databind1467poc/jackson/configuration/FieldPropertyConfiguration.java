@@ -1,7 +1,8 @@
-package com.plcarmel.jackson.databind1467poc.generic.configuration;
+package com.plcarmel.jackson.databind1467poc.jackson.configuration;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.plcarmel.jackson.databind1467poc.generic.configuration.CachedTypeConfigurationFactory;
 import com.plcarmel.jackson.databind1467poc.theory.SettablePropertyConfiguration;
 import com.plcarmel.jackson.databind1467poc.theory.TypeConfiguration;
 

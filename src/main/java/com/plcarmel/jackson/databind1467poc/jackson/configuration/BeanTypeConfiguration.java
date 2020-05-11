@@ -1,4 +1,4 @@
-package com.plcarmel.jackson.databind1467poc.generic.configuration;
+package com.plcarmel.jackson.databind1467poc.jackson.configuration;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.plcarmel.jackson.databind1467poc.theory.CreatorConfiguration;
