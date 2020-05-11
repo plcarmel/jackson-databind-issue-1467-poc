@@ -6,38 +6,20 @@
 >
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.fasterxml.jackson.core</groupId>
-  <artifactId>jackson-databind-issue-1467-poc</artifactId>
+  <groupId>com.plcarmel.steps</groupId>
+  <artifactId>steps</artifactId>
+  <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
+
+  <modules>
+    <module>steps-theory</module>
+    <module>steps-generic</module>
+    <module>steps-jackson</module>
+  </modules>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jackson.version>2.10.2</jackson.version>
   </properties>
-
-  <dependencies>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${jackson.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
-      <version>${jackson.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.rainerhahnekamp</groupId>
-      <artifactId>sneakythrow</artifactId>
-      <version>1.1.0</version>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.13</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
 
   <build>
     <plugins>
