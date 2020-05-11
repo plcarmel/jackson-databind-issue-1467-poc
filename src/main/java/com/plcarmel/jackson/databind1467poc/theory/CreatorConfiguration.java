@@ -1,4 +1,13 @@
 package com.plcarmel.jackson.databind1467poc.theory;
 
-public interface CreatorConfiguration<T> {
+import java.util.List;
+
+public interface CreatorConfiguration<TClass> {
+
+  Class<TClass> getType();
+
+  List<PropertyConfiguration<TClass, ?>> getParamConfigurations();
+
+  TClass instantiate(List<Object> params);
+
 }

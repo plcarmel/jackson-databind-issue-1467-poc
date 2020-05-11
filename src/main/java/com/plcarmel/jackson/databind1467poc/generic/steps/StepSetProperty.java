@@ -6,18 +6,18 @@ import com.plcarmel.jackson.databind1467poc.theory.*;
 
 import java.util.stream.Stream;
 
-public class StepSetProperty<TInput, TClass, TProperty>
-  implements Step<TInput, NoData>, GetDependenciesMixin<Step<TInput, ?>>
+public class StepSetProperty<TInput, TClass, TValue>
+  implements Step<TInput, NoData>, GetDependenciesMixin<Group<Step<TInput, ?>>, Step<TInput, ?>>
 {
-  private final PropertyConfiguration<? extends TProperty> propertyConfiguration;
-  private final StepGroupOne<TInput, TClass> instantiationStep;
-  private final StepGroupOne<TInput, ? extends TProperty> deserializationStep;
+  private final SettablePropertyConfiguration<TClass, TValue> propertyConfiguration;
+  private final StepGroupOne<TInput, ? extends TClass> instantiationStep;
+  private final StepGroupOne<TInput, ? extends TValue> deserializationStep;
   private final StepGroupMany<TInput> unmanaged;
 
   public StepSetProperty(
-    PropertyConfiguration<? extends TProperty> propertyConfiguration,
-    StepGroupOne<TInput, TClass> instantiationStep,
-    StepGroupOne<TInput, ? extends TProperty> deserializationStep,
+    SettablePropertyConfiguration<TClass, TValue> propertyConfiguration,
+    StepGroupOne<TInput, ? extends TClass> instantiationStep,
+    StepGroupOne<TInput, ? extends TValue> deserializationStep,
     StepGroupMany<TInput> unmanaged
   ) {
     this.propertyConfiguration = propertyConfiguration;
@@ -37,7 +37,7 @@ public class StepSetProperty<TInput, TClass, TProperty>
   }
 
   @Override
-  public DependencyGroups<Step<TInput, ?>> getDependencyGroups() {
+  public DependencyGroups<Group<Step<TInput, ?>>, Step<TInput, ?>> getDependencyGroups() {
     return new DependencyGroups<>(Stream.of(instantiationStep, deserializationStep, unmanaged));
   }
 }

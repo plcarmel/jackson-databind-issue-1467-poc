@@ -3,6 +3,7 @@ package com.plcarmel.jackson.databind1467poc.jackson.steps;
 import com.fasterxml.jackson.core.JsonParser;
 import com.plcarmel.jackson.databind1467poc.generic.groups.DependencyGroups;
 import com.plcarmel.jackson.databind1467poc.generic.groups.GetDependenciesMixin;
+import com.plcarmel.jackson.databind1467poc.generic.groups.Group;
 import com.plcarmel.jackson.databind1467poc.generic.groups.StepGroupMany;
 import com.plcarmel.jackson.databind1467poc.jackson.instances.InstanceDeserializeStandardValue;
 import com.plcarmel.jackson.databind1467poc.theory.InstanceFactory;
@@ -13,12 +14,12 @@ import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;
 import java.util.stream.Stream;
 
 public class StepDeserializeStandardValue<TResult>
-  implements Step<JsonParser, TResult>, GetDependenciesMixin<Step<JsonParser, ?>>
+  implements Step<JsonParser, TResult>, GetDependenciesMixin<Group<Step<JsonParser, ?>>, Step<JsonParser, ?>>
 {
-  private final PropertyConfiguration<TResult> conf;
+  private final PropertyConfiguration<?, TResult> conf;
   private final StepGroupMany<JsonParser> unmanaged;
 
-  public StepDeserializeStandardValue(PropertyConfiguration<TResult> conf, StepGroupMany<JsonParser> unmanaged) {
+  public StepDeserializeStandardValue(PropertyConfiguration<?, TResult> conf, StepGroupMany<JsonParser> unmanaged) {
     this.conf = conf;
     this.unmanaged = unmanaged;
   }
@@ -29,7 +30,7 @@ public class StepDeserializeStandardValue<TResult>
   }
 
   @Override
-  public DependencyGroups<Step<JsonParser, ?>> getDependencyGroups() {
+  public DependencyGroups<Group<Step<JsonParser, ?>>, Step<JsonParser, ?>> getDependencyGroups() {
     return new DependencyGroups<>(Stream.of(unmanaged));
   }
 }

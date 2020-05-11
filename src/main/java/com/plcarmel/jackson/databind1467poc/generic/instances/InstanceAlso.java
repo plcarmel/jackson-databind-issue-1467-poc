@@ -3,15 +3,19 @@ package com.plcarmel.jackson.databind1467poc.generic.instances;
 import com.plcarmel.jackson.databind1467poc.generic.groups.*;
 import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public final class InstanceAlso<TInput, TResult>
-  extends InstanceHavingUnmanagedDependencies<TInput, TResult>
-  implements GetDependenciesMixin<StepInstance<TInput, ?>>, AreDependenciesSatisfiedMixin<TInput, TResult>
+  extends
+    InstanceHavingUnmanagedDependencies<TInput, TResult>
+  implements
+    GetDependenciesMixin<InstanceGroup<TInput>, StepInstance<TInput, ?>>,
+    RemoveDependencyFromListMixin<TInput, TResult>,
+    CollapseMixin<TInput, TResult>,
+    NoTokenMixin<TInput, TResult>,
+    NonExecutableMixin<TInput, TResult>
 {
-  private InstanceGroupOne<TInput, TResult> managed;
-  private TResult data;
+  private final InstanceGroupOne<TInput, TResult> managed;
 
   public InstanceAlso(
     InstanceGroupOne<TInput, TResult> managed,
@@ -23,45 +27,22 @@ public final class InstanceAlso<TInput, TResult>
 
   @Override
   public boolean isOptional() {
-    return false;
+    return managed.get().isOptional();
   }
 
   @Override
-  public boolean canHandleCurrentToken(TInput parser) {
-    return false;
-  }
-
-  @Override
-  public void pushToken(TInput input) {
-    throw new RuntimeException("Method should not be called.");
+  public boolean hasTokenBeenReceived() {
+    return getData() != null;
   }
 
   @Override
   public TResult getData() {
-    return data;
+    return managed.get().getData();
   }
 
   @Override
-  public boolean isDone() {
-    return managed == null && (unmanaged == null || unmanaged.areDependenciesSatisfied());
-  }
-
-  private void execute() {
-    data = managed.get().getData();
-  }
-
-  @Override
-  public void prune(Consumer<StepInstance<TInput, ?>> onDependencyRemoved) {
-    if (managed != null) {
-      managed.prune(d -> { execute(); return true; }, onDependencyRemoved, this);
-      if (managed.isDone()) managed = null;
-    }
-    super.prune(onDependencyRemoved);
-  }
-
-  @Override
-  public DependencyGroups<StepInstance<TInput, ?>> getDependencyGroups() {
-    return new DependencyGroups<>(Stream.of(managed, unmanaged));
+  public InstanceDependencyGroups<TInput> getDependencyGroups() {
+    return new InstanceDependencyGroups<>(Stream.of(managed, unmanaged));
   }
 
 }

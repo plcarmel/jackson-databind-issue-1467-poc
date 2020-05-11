@@ -4,21 +4,21 @@ import com.plcarmel.jackson.databind1467poc.theory.HasDependencies;
 
 import java.util.List;
 
-public class GroupMany<T extends HasDependencies<T>>
-  implements HasDependencies<T>
+public class GroupMany<TDep extends HasDependencies<TDep>> extends GroupBase<TDep>
 {
-  private final List<T> list;
+  private final List<TDep> list;
 
-  public List<T> getList() {
+  public List<TDep> getList() {
     return list;
   }
 
-  public GroupMany(List<T> list) {
+  public GroupMany(boolean isManaged, List<TDep> list) {
+    super(isManaged);
     this.list = list;
   }
 
   @Override
-  public List<T> getDependencies() {
+  public List<TDep> getDependencies() {
     return list;
   }
 }

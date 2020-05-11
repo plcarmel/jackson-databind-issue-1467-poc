@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class GroupOne<TMain extends TDep, TDep extends HasDependencies<TDep>>
-  implements HasDependencies<TDep>
+  extends GroupBase<TDep>
 {
   protected TMain sole;
 
@@ -15,6 +15,7 @@ public class GroupOne<TMain extends TDep, TDep extends HasDependencies<TDep>>
   }
 
   public GroupOne(TMain sole) {
+    super(true);
     this.sole = sole;
   }
 

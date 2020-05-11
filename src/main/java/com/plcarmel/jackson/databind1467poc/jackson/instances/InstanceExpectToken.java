@@ -3,53 +3,55 @@ package com.plcarmel.jackson.databind1467poc.jackson.instances;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import com.plcarmel.jackson.databind1467poc.generic.groups.AreDependenciesSatisfiedMixin;
-import com.plcarmel.jackson.databind1467poc.generic.groups.DependencyGroups;
-import com.plcarmel.jackson.databind1467poc.generic.groups.GetDependenciesMixin;
-import com.plcarmel.jackson.databind1467poc.generic.groups.InstanceGroupMany;
+import com.plcarmel.jackson.databind1467poc.generic.groups.*;
 import com.plcarmel.jackson.databind1467poc.generic.instances.InstanceHavingUnmanagedDependencies;
 import com.plcarmel.jackson.databind1467poc.generic.instances.NoDataMixin;
+import com.plcarmel.jackson.databind1467poc.generic.instances.NonExecutableMixin;
 import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.NoData;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.stream.Stream;
-
-import static java.util.Collections.emptyList;
 
 public final class InstanceExpectToken
   extends
-  InstanceHavingUnmanagedDependencies<JsonParser, NoData>
+    InstanceHavingUnmanagedDependencies<JsonParser, NoData>
   implements
-    GetDependenciesMixin<StepInstance<JsonParser, ?>>,
+    GetDependenciesMixin<InstanceGroup<JsonParser>, StepInstance<JsonParser, ?>>,
+    RemoveDependencyFromListMixin<JsonParser, NoData>,
+    CollapseMixin<JsonParser, NoData>,
     NoDataMixin<JsonParser>,
-    AreDependenciesSatisfiedMixin<JsonParser, NoData>
+    NonExecutableMixin<JsonParser, NoData>
 {
   private final JsonToken expectedTokenKind;
   private final Object expectedTokenValue;
   private final boolean useTokenValue;
+  private final boolean isOptional;
 
   private boolean tokenReceived = false;
 
   public InstanceExpectToken(
     JsonToken expectedTokenKind,
     Object expectedTokenValue,
+    boolean isOptional,
     InstanceGroupMany<JsonParser> unmanaged
   ) {
     super(unmanaged);
     this.expectedTokenKind = expectedTokenKind;
     this.expectedTokenValue = expectedTokenValue;
+    this.isOptional = isOptional;
     useTokenValue = true;
   }
 
   public InstanceExpectToken(
     JsonToken expectedTokenKind,
+    boolean isOptional,
     InstanceGroupMany<JsonParser> unmanaged
   ) {
     super(unmanaged);
     this.expectedTokenKind = expectedTokenKind;
     this.expectedTokenValue = null;
+    this.isOptional = isOptional;
     useTokenValue = false;
   }
 
@@ -73,21 +75,17 @@ public final class InstanceExpectToken
 
   @Override
   public boolean isOptional() {
-    return false;
+    return isOptional;
   }
 
   @Override
-  public boolean isDone() {
-    return tokenReceived && areDependenciesSatisfied();
+  public boolean hasTokenBeenReceived() {
+    return tokenReceived;
   }
 
   @Override
-  public DependencyGroups<StepInstance<JsonParser, ?>> getDependencyGroups() {
-    return new DependencyGroups<>(Stream.of(unmanaged));
+  public InstanceDependencyGroups<JsonParser> getDependencyGroups() {
+    return new InstanceDependencyGroups<>(Stream.of(unmanaged));
   }
 
-  @Override
-  public List<StepInstance<JsonParser, ?>> getDependencies() {
-    return emptyList();
-  }
 }

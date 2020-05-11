@@ -8,12 +8,13 @@ import java.util.stream.Collectors;
 
 public class StepGroupMany<TInput> extends GroupMany<Step<TInput, ?>> {
 
-  public StepGroupMany(List<Step<TInput, ?>> list) {
-    super(list);
+  public StepGroupMany(boolean isManaged, List<Step<TInput, ?>> list) {
+    super(isManaged, list);
   }
 
   public InstanceGroupMany<TInput> instantiated(InstanceFactory<TInput> factory) {
     return new InstanceGroupMany<>(
+      isManaged(),
       getDependencies()
         .stream()
         .map(factory::instantiate)

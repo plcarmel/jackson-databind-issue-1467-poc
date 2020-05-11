@@ -1,30 +1,31 @@
 package com.plcarmel.jackson.databind1467poc.generic.instances;
 
-import com.plcarmel.jackson.databind1467poc.generic.configuration.FieldPropertyConfiguration;
 import com.plcarmel.jackson.databind1467poc.generic.groups.*;
+import com.plcarmel.jackson.databind1467poc.theory.SettablePropertyConfiguration;
 import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.NoData;
-import com.plcarmel.jackson.databind1467poc.theory.PropertyConfiguration;
 
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public class InstanceSetProperty<TInput, TClass, TProperty>
+public final class InstanceSetProperty<TInput, TClass, TValue>
   extends
-  InstanceHavingUnmanagedDependencies<TInput, NoData>
+    InstanceHavingUnmanagedDependencies<TInput, NoData>
   implements
-    GetDependenciesMixin<StepInstance<TInput, ?>>,
+    GetDependenciesMixin<InstanceGroup<TInput>, StepInstance<TInput,?>>,
+    RemoveDependencyFromListMixin<TInput, NoData>,
+    CollapseMixin<TInput, NoData>,
     NoDataMixin<TInput>,
-    AreDependenciesSatisfiedMixin<TInput, NoData>
+    NoTokenMixin<TInput, NoData>
 {
-  private final PropertyConfiguration<? extends TProperty> propertyConfiguration;
-  private InstanceGroupOne<TInput, TClass> instantiationStep;
-  private InstanceGroupOne<TInput, ? extends TProperty> deserializationStep;
+  private final SettablePropertyConfiguration<TClass, TValue> propertyConfiguration;
+  private final InstanceGroupOne<TInput, ? extends TClass> instantiationStep;
+  private final InstanceGroupOne<TInput, ? extends TValue> deserializationStep;
+  private boolean hasBeenExecuted;
 
   public InstanceSetProperty(
-    PropertyConfiguration<? extends TProperty> propertyConfiguration,
-    InstanceGroupOne<TInput, TClass> instantiationStep,
-    InstanceGroupOne<TInput, ? extends TProperty> deserializationStep,
+    SettablePropertyConfiguration<TClass, TValue> propertyConfiguration,
+    InstanceGroupOne<TInput, ? extends TClass> instantiationStep,
+    InstanceGroupOne<TInput, ? extends TValue> deserializationStep,
     InstanceGroupMany<TInput> unmanaged
   ) {
     super(unmanaged);
@@ -34,8 +35,8 @@ public class InstanceSetProperty<TInput, TClass, TProperty>
   }
 
   @Override
-  public DependencyGroups<StepInstance<TInput, ?>> getDependencyGroups() {
-    return new DependencyGroups<>(Stream.of(instantiationStep, deserializationStep, unmanaged));
+  public InstanceDependencyGroups<TInput> getDependencyGroups() {
+    return new InstanceDependencyGroups<>(Stream.of(instantiationStep, deserializationStep, unmanaged));
   }
 
   @Override
@@ -44,54 +45,19 @@ public class InstanceSetProperty<TInput, TClass, TProperty>
   }
 
   @Override
-  public boolean canHandleCurrentToken(TInput parser) {
-    return false;
+  public Boolean isReadyToBeExecuted() {
+    return instantiationStep.get().isDone() && deserializationStep.get().isDone();
   }
 
   @Override
-  public void pushToken(TInput parser) {
-    throw new RuntimeException("Method should not be called.");
+  public Boolean hasBeenExecuted() {
+    return hasBeenExecuted;
   }
 
   @Override
-  public boolean isDone() {
-    return instantiationStep == null &&
-      deserializationStep == null &&
-      ( unmanaged == null || unmanaged.areDependenciesSatisfied());
-  }
-
-  private void execute() {
-    if (propertyConfiguration instanceof FieldPropertyConfiguration) {
-      //noinspection unchecked
-      final FieldPropertyConfiguration<TClass, TProperty> fpc =
-        (FieldPropertyConfiguration<TClass, TProperty>) propertyConfiguration;
-      try {
-        fpc.getField().set(instantiationStep.get().getData(), deserializationStep.get().getData());
-      } catch (IllegalAccessException e) {
-        throw new RuntimeException(e);
-      }
-    }
-  }
-
-  @Override
-  public void prune(Consumer<StepInstance<TInput, ?>> onDependencyRemoved) {
-    if (instantiationStep != null) {
-      instantiationStep.prune(this::doRemoveDependency, onDependencyRemoved, this);
-      if (instantiationStep.get() == null) instantiationStep = null;
-    }
-    if (deserializationStep != null) {
-      deserializationStep.prune(this::doRemoveDependency, onDependencyRemoved, this);
-      if (deserializationStep.get() == null) deserializationStep = null;
-    }
-    super.prune(onDependencyRemoved);
-  }
-
-  private Boolean doRemoveDependency(StepInstance<TInput, ?> d) {
-    if (instantiationStep == null || deserializationStep == null) return true;
-    final InstanceGroupOne<TInput, ?> other = instantiationStep.get() == d ? deserializationStep : instantiationStep;
-    if (!other.isDone()) return false;
-    execute();
-    return true;
+  public void execute() {
+    propertyConfiguration.set(instantiationStep.get().getData(), deserializationStep.get().getData());
+    hasBeenExecuted = true;
   }
 }
 

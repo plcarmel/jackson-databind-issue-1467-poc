@@ -8,11 +8,16 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
-public class DependencyGroups<TDep extends HasDependencies<TDep>> implements HasDependencies<TDep> {
+public class DependencyGroups<TGroup extends HasDependencies<TDep>, TDep extends HasDependencies<TDep>>
+  implements HasDependencies<TDep>
+{
+  private final List<TGroup> groups;
 
-  private final List<HasDependencies<TDep>> groups;
+  public List<TGroup> getGroups() {
+    return groups;
+  }
 
-  public DependencyGroups(Stream<HasDependencies<TDep>> groups) {
+  public DependencyGroups(Stream<? extends TGroup> groups) {
     this.groups = groups.filter(Objects::nonNull).collect(toList());
   }
 
@@ -20,4 +25,5 @@ public class DependencyGroups<TDep extends HasDependencies<TDep>> implements Has
   public List<TDep> getDependencies() {
     return groups.stream().map(HasDependencies::getDependencies).flatMap(List::stream).collect(toList());
   }
+
 }

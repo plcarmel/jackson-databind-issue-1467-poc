@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 // Main algorithm, it dispatches each token to the appropriate node (execution step) of the
 // dependency graph, starting with the leaves. If no leave can handle the current token, the
@@ -15,12 +16,9 @@ public class Interpreter<TInput, TResult> implements AsynchronousDeserialization
 
   public Interpreter(Step<TInput, TResult> finalStep) {
     this.finalStep = finalStep.instantiated();
-    this.finalStep.setTreeParents();
     startToFinish = topologicalSort(this.finalStep, HasDependencies::getDependencies);
-    new ArrayList<>(startToFinish)
-      .stream()
-      .filter(d -> d.getDependencies().isEmpty())
-      .forEach(d -> d.prune(startToFinish::remove));
+    startToFinish.forEach(StepInstance::registerAsParent);
+    getLeaves().forEach(s -> s.recurse(startToFinish::remove));
   }
 
   @Override
@@ -38,14 +36,12 @@ public class Interpreter<TInput, TResult> implements AsynchronousDeserialization
         .findFirst()
         .orElseThrow(() -> new IllegalStateException("No step can handle current token"));
     step.pushToken(parser);
-    if (step.isDone()) {
-      step.prune(startToFinish::remove);
-    }
+    step.recurse(startToFinish::remove);
   }
 
   @Override
   public boolean isDone() {
-    return startToFinish.size() == 1;
+    return finalStep.isDone();
   }
 
   @Override
@@ -69,5 +65,16 @@ public class Interpreter<TInput, TResult> implements AsynchronousDeserialization
     }
     Collections.reverse(result);
     return result;
+  }
+
+  public void eof() {
+    new ArrayList<>(startToFinish).forEach(d -> d.clean(x -> {}, true));
+    getLeaves().forEach(d -> d.recurse(x -> {}));
+  }
+
+  private Stream<StepInstance<TInput, ?>> getLeaves() {
+    return new ArrayList<>(startToFinish)
+      .stream()
+      .filter(d -> d.getDependencies().isEmpty());
   }
 }

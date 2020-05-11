@@ -2,6 +2,7 @@ package com.plcarmel.jackson.databind1467poc.generic.steps;
 
 import com.plcarmel.jackson.databind1467poc.generic.groups.DependencyGroups;
 import com.plcarmel.jackson.databind1467poc.generic.groups.GetDependenciesMixin;
+import com.plcarmel.jackson.databind1467poc.generic.groups.Group;
 import com.plcarmel.jackson.databind1467poc.generic.groups.StepGroupMany;
 import com.plcarmel.jackson.databind1467poc.generic.instances.InstanceInstantiateUsingDefaultConstructor;
 import com.plcarmel.jackson.databind1467poc.theory.InstanceFactory;
@@ -12,7 +13,9 @@ import com.plcarmel.jackson.databind1467poc.theory.TypeConfiguration;
 import java.util.stream.Stream;
 
 public class StepInstantiateUsingDefaultConstructor<TInput, TResult>
-  implements Step<TInput, TResult>, GetDependenciesMixin<Step<TInput, ?>>
+  implements
+    Step<TInput, TResult>,
+    GetDependenciesMixin<Group<Step<TInput, ?>>, Step<TInput, ?>>
 {
   private final TypeConfiguration<TResult> conf;
   private final StepGroupMany<TInput> unmanaged;
@@ -28,7 +31,7 @@ public class StepInstantiateUsingDefaultConstructor<TInput, TResult>
   }
 
   @Override
-  public DependencyGroups<Step<TInput, ?>> getDependencyGroups() {
+  public DependencyGroups<Group<Step<TInput, ?>>, Step<TInput, ?>> getDependencyGroups() {
     return new DependencyGroups<>(Stream.of(unmanaged));
   }
 }

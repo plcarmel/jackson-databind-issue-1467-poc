@@ -1,5 +1,7 @@
 package com.plcarmel.jackson.databind1467poc;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.plcarmel.jackson.databind1467poc.jackson.ObjectMapper;
 import org.junit.Test;
@@ -66,6 +68,23 @@ public class BasicTest {
       new ObjectMapper().readValue(str, ClassWithUnwrappedPublicFieldProperty.class);
     assertNotNull(result);
     assertEquals(result.y.x, 1234);
+  }
+
+  public static class ClassWithConstructorProperty {
+    public final int w;
+    @JsonCreator
+    public ClassWithConstructorProperty(@JsonProperty("z") int x) {
+      w = x;
+    }
+  }
+
+  @Test
+  public void constructorPropertyTest() throws IOException {
+    final String str = "{ \"z\": 1234 }";
+    final ClassWithConstructorProperty result =
+      new ObjectMapper().readValue(str, ClassWithConstructorProperty.class);
+    assertNotNull(result);
+    assertEquals(result.w, 1234);
   }
 
 }

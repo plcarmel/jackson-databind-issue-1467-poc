@@ -15,7 +15,7 @@ public class UnmanagedDependenciesBuilder<TInput, TResult> extends BuilderHaving
 
   @Override
   public Step<TInput, TResult> build() {
-    return stepConstructor.apply(new StepGroupMany<>(getDependencies()));
+    return stepConstructor.apply(new StepGroupMany<>(false, getDependencies()));
   }
 
 }

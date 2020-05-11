@@ -9,7 +9,7 @@ import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 import java.util.stream.Stream;
 
 public class StepAlso<TInput, TResult>
-  implements GetDependenciesMixin<Step<TInput, ?>>, Step<TInput, TResult>
+  implements Step<TInput, TResult>, GetDependenciesMixin<Group<Step<TInput, ?>>, Step<TInput, ?>>
 {
   private final StepGroupOne<TInput, TResult> managed;
   private final StepGroupMany<TInput> unmanaged;
@@ -28,7 +28,7 @@ public class StepAlso<TInput, TResult>
   }
 
   @Override
-  public DependencyGroups<Step<TInput, ?>> getDependencyGroups() {
+  public DependencyGroups<Group<Step<TInput, ?>>, Step<TInput, ?>> getDependencyGroups() {
     return new DependencyGroups<>(Stream.of(managed, unmanaged));
   }
 }

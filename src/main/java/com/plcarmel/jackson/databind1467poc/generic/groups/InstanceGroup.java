@@ -1,25 +1,28 @@
 package com.plcarmel.jackson.databind1467poc.generic.groups;
 
 import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
-import com.plcarmel.jackson.databind1467poc.theory.HasDependencies;
 
+import java.util.ArrayList;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
-public interface InstanceGroup<TInput> extends HasDependencies<StepInstance<TInput, ?>> {
+public interface InstanceGroup<TInput> extends Group<StepInstance<TInput, ?>> {
 
-  default boolean isDone() {
-    return getDependencies().stream().allMatch(StepInstance::isDone);
+  void removeDependencyFromList(StepInstance<TInput, ?> dependency);
+
+  boolean anyDone();
+  boolean allDone();
+
+  default void collapse(
+    StepInstance<TInput, ?> stepInstance,
+    Consumer<StepInstance<TInput, ?>> onDependencyRemoved
+  ) {
+    if (!isManaged()) {
+      new ArrayList<>(getDependencies()).stream().filter(StepInstance::isDone).forEach(d -> {
+        removeDependencyFromList(d);
+        d.removeParentFromSet(stepInstance);
+        onDependencyRemoved.accept(d);
+      });
+    }
   }
-
-  default boolean areDependenciesSatisfied() {
-    return getDependencies().stream().allMatch(d -> d.isOptional() || d.areDependenciesSatisfied());
-  }
-
-  void prune(
-    Predicate<StepInstance<TInput, ?>> doRemoveDependency,
-    Consumer<StepInstance<TInput, ?>> onDependencyRemoved,
-    StepInstance<TInput, ?> ref
-  );
 
 }

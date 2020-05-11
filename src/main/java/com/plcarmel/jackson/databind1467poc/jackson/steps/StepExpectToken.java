@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.plcarmel.jackson.databind1467poc.generic.groups.DependencyGroups;
 import com.plcarmel.jackson.databind1467poc.generic.groups.GetDependenciesMixin;
+import com.plcarmel.jackson.databind1467poc.generic.groups.Group;
 import com.plcarmel.jackson.databind1467poc.generic.groups.StepGroupMany;
 import com.plcarmel.jackson.databind1467poc.jackson.instances.InstanceExpectToken;
 import com.plcarmel.jackson.databind1467poc.theory.InstanceFactory;
@@ -12,30 +13,35 @@ import com.plcarmel.jackson.databind1467poc.theory.StepInstance;
 import com.plcarmel.jackson.databind1467poc.theory.NoData;
 
 public class StepExpectToken
-  implements Step<JsonParser, NoData>, GetDependenciesMixin<Step<JsonParser, ?>>
+  implements Step<JsonParser, NoData>, GetDependenciesMixin<Group<Step<JsonParser, ?>>, Step<JsonParser, ?>>
 {
   private final JsonToken expectedTokenKind;
   private final Object expectedTokenValue;
   private final boolean useTokenValue;
+  private final boolean isOptional;
   private final StepGroupMany<JsonParser> unmanaged;
 
   public StepExpectToken(
     JsonToken expectedTokenKind,
     Object expectedTokenValue,
+    boolean isOptional,
     StepGroupMany<JsonParser> unmanaged
   ) {
     this.expectedTokenKind = expectedTokenKind;
     this.expectedTokenValue = expectedTokenValue;
+    this.isOptional = isOptional;
     this.unmanaged = unmanaged;
     useTokenValue = true;
   }
 
   public StepExpectToken(
     JsonToken expectedTokenKind,
+    boolean isOptional,
     StepGroupMany<JsonParser> unmanaged
   ) {
     this.expectedTokenKind = expectedTokenKind;
     this.expectedTokenValue = null;
+    this.isOptional = isOptional;
     this.unmanaged = unmanaged;
     useTokenValue = false;
   }
@@ -46,16 +52,18 @@ public class StepExpectToken
       ? new InstanceExpectToken(
         expectedTokenKind,
         expectedTokenValue,
+        isOptional,
         unmanaged.instantiated(factory)
       )
       : new InstanceExpectToken(
         expectedTokenKind,
+        isOptional,
         unmanaged.instantiated(factory)
       );
   }
 
   @Override
-  public DependencyGroups<Step<JsonParser, ?>> getDependencyGroups() {
+  public DependencyGroups<Group<Step<JsonParser, ?>>, Step<JsonParser, ?>> getDependencyGroups() {
     return null;
   }
 }
