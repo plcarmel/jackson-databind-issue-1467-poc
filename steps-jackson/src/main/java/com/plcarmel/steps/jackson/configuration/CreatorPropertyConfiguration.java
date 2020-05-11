@@ -1,26 +1,33 @@
 package com.plcarmel.steps.jackson.configuration;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.plcarmel.steps.theory.PropertyConfiguration;
 import com.plcarmel.steps.theory.TypeConfiguration;
 
+import java.lang.reflect.Parameter;
+
 public class CreatorPropertyConfiguration<TClass, TValue> implements PropertyConfiguration<TClass, TValue> {
 
-  private final String name;
-  private final TypeConfiguration<TValue> typeConfiguration;
+  private final Parameter parameter;
 
-  public CreatorPropertyConfiguration(String name, TypeConfiguration<TValue> typeConfiguration) {
-    this.name = name;
-    this.typeConfiguration = typeConfiguration;
+  public CreatorPropertyConfiguration(Parameter parameter) {
+    this.parameter = parameter;
+    if (parameter.getAnnotationsByType(JsonProperty.class).length != 1) {
+      throw new RuntimeException("Multiple JsonProperty on parameter %s");
+    }
   }
 
   @Override
   public String getName() {
-    return name;
+    return parameter.getAnnotationsByType(JsonProperty.class)[0].value();
   }
 
   @Override
   public TypeConfiguration<TValue> getTypeConfiguration() {
-    return typeConfiguration;
+    //noinspection unchecked
+    return (TypeConfiguration<TValue>)
+      CachedTypeConfigurationFactory.getInstance().getTypeConfiguration(parameter.getClass());
   }
 
   @Override
@@ -30,7 +37,7 @@ public class CreatorPropertyConfiguration<TClass, TValue> implements PropertyCon
 
   @Override
   public boolean isUnwrapped() {
-    return false;
+    return parameter.getAnnotationsByType(JsonUnwrapped.class).length != 0;
   }
 
 }

@@ -86,6 +86,22 @@ public class AcceptanceTest {
     assertEquals(result.w, 1234);
   }
 
+  public static class ClassWithNonStandardConstructorProperty {
+    public final ClassWithPublicFieldStandardProperty hello;
+    public ClassWithNonStandardConstructorProperty(@JsonProperty("world") ClassWithPublicFieldStandardProperty hello) {
+      this.hello = hello;
+    }
+  }
+
+  @Test
+  public void constructorNonStandardPropertyTest() throws IOException {
+    final String str = "{ \"world\": { \"x\": 1234 } }";
+    final ClassWithNonStandardConstructorProperty result =
+      new ObjectMapper().readValue(str, ClassWithNonStandardConstructorProperty.class);
+    assertNotNull(result);
+    assertNotNull(result.hello);
+    assertEquals(result.hello.x,1234);
+  }
 
 
 }

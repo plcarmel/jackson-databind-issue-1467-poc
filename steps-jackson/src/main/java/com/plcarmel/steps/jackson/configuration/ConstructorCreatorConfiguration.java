@@ -6,10 +6,11 @@ import com.plcarmel.steps.theory.PropertyConfiguration;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
-import static com.plcarmel.steps.jackson.SupportedTypes.standardTypeClasses;
 import static java.util.stream.Collectors.toList;
 
 public class ConstructorCreatorConfiguration<TClass> implements CreatorConfiguration<TClass> {
@@ -30,20 +31,7 @@ public class ConstructorCreatorConfiguration<TClass> implements CreatorConfigura
     return Arrays
       .stream(constructor.getParameters())
       .filter(p -> p.getAnnotationsByType(JsonProperty.class).length != 0)
-      .map(p -> {
-        final JsonProperty[] annotations = p.getAnnotationsByType(JsonProperty.class);
-        if (annotations.length != 1) {
-          throw new RuntimeException("Multiple JsonProperty on parameter %s");
-        }
-        final Class<?> paramClass = p.getType();
-        //noinspection unchecked
-        return new CreatorPropertyConfiguration<TClass, Object>(
-          annotations[0].value(),
-          standardTypeClasses.contains(paramClass)
-            ? new StandardTypeConfiguration<>((Class<Object>) paramClass)
-            : new BeanTypeConfiguration<>((Class<Object>) paramClass)
-        );
-      })
+      .map((Function<Parameter, CreatorPropertyConfiguration<TClass, Object>>) CreatorPropertyConfiguration::new)
       .collect(toList());
   }
 
