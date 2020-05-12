@@ -27,7 +27,7 @@ public class CreatorPropertyConfiguration<TClass, TValue> implements PropertyCon
   public TypeConfiguration<TValue> getTypeConfiguration() {
     //noinspection unchecked
     return (TypeConfiguration<TValue>)
-      CachedTypeConfigurationFactory.getInstance().getTypeConfiguration(parameter.getClass());
+      CachedTypeConfigurationFactory.getInstance().getTypeConfiguration(parameter.getType());
   }
 
   @Override
