@@ -11,8 +11,12 @@ import java.util.stream.Stream;
 // level before the leaves if probed, and so on.
 public class Interpreter<TInput, TResult> implements AsynchronousDeserialization<TInput, TResult> {
 
-  private final List<StepInstance<TInput, ?>> startToFinish;
   private final StepInstance<TInput, TResult> finalStep;
+  private final List<StepInstance<TInput, ?>> startToFinish;
+
+  public StepInstance<TInput, TResult> getFinalStep() {
+    return finalStep;
+  }
 
   public Interpreter(Step<TInput, TResult> finalStep) {
     this.finalStep = finalStep.instantiated();

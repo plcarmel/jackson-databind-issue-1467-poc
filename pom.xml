@@ -15,6 +15,7 @@
     <module>steps-theory</module>
     <module>steps-generic</module>
     <module>steps-jackson</module>
+    <module>steps-graphviz</module>
   </modules>
 
   <properties>

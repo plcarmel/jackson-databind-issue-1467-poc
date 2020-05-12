@@ -3,10 +3,19 @@ package com.plcarmel.steps.jackson;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.core.JsonParser;
+import com.plcarmel.steps.graphviz.SimpleGraphGenerator;
+import com.plcarmel.steps.theory.StepInstance;
+import guru.nidi.graphviz.engine.Format;
+import guru.nidi.graphviz.engine.Graphviz;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Objects;
 
+import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.*;
 
 public class AcceptanceTest {
@@ -93,11 +102,37 @@ public class AcceptanceTest {
     }
   }
 
+  private int i = 0;
+
+  private final static Format graphFormat = Format.SVG;
+
+  private void printGraph(StepInstance<JsonParser, ?> finalStep) {
+    final SimpleGraphGenerator<StepInstance<JsonParser, ?>> graphGenerator = new SimpleGraphGenerator<>();
+    try {
+      Graphviz
+        .fromGraph(graphGenerator.generateGraph(finalStep))
+        .height(500)
+        .render(graphFormat)
+        .toFile(new File("target/graph" + (++i) + "." + graphFormat.fileExtension));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void removePreviousGraphs() {
+    final File[] files =
+        new File("target")
+          .listFiles(s -> s.getName().matches("graph.*\\." + graphFormat.fileExtension));
+    //noinspection ResultOfMethodCallIgnored
+    Arrays.stream(requireNonNull(files)).forEach(File::delete);
+  }
+
   @Test
   public void constructorNonStandardPropertyTest() throws IOException {
     final String str = "{ \"world\": { \"x\": 1234 } }";
+    removePreviousGraphs();
     final ClassWithNonStandardConstructorProperty result =
-      new ObjectMapper().readValue(str, ClassWithNonStandardConstructorProperty.class);
+      new ObjectMapper().readValue(str, ClassWithNonStandardConstructorProperty.class, this::printGraph);
     assertNotNull(result);
     assertNotNull(result.hello);
     assertEquals(result.hello.x,1234);
