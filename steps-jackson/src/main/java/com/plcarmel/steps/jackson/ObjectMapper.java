@@ -29,7 +29,9 @@ public class ObjectMapper {
       if (onNewGraph != null) onNewGraph.accept(interpreter.getFinalStep());
       interpreter.pushToken(parser);
     }
+    if (onNewGraph != null) onNewGraph.accept(interpreter.getFinalStep());
     interpreter.eof();
+    if (onNewGraph != null) onNewGraph.accept(interpreter.getFinalStep());
     if (!interpreter.isDone()) {
       throw new IOException("Not done.");
     }

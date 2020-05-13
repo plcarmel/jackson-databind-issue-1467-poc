@@ -21,7 +21,7 @@ public abstract class GenericStepFactory<TInput, TToken> implements StepFactory<
   }
 
   public <TClass> StepBuilder<TInput, ? extends TClass> builderInstantiateUsing(
-    Step<TInput, NoData> upperStartObject,
+    Step<TInput, ?> triggerDependency,
     CreatorConfiguration<TClass> creatorConf
   ) {
     return new UnmanagedDependenciesBuilder<>(unmanaged ->
@@ -32,7 +32,7 @@ public abstract class GenericStepFactory<TInput, TToken> implements StepFactory<
           creatorConf
             .getParamConfigurations()
             .stream()
-            .map(c -> (StepBuilder<TInput, ?>) this.builderDeserializeProperty(upperStartObject, c))
+            .map(c -> (StepBuilder<TInput, ?>) this.builderDeserializeProperty(triggerDependency, c))
             .map(StepBuilder::build)
             .collect(toList())
         ),

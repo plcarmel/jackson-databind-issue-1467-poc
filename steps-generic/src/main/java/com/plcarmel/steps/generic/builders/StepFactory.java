@@ -13,7 +13,7 @@ public interface StepFactory<TInput, TToken> {
   );
 
   <TResult> StepBuilder<TInput, ? extends TResult> builderInstantiateUsing(
-    Step<TInput, NoData> upperStartObject,
+    Step<TInput, ?> triggerDependency,
     CreatorConfiguration<TResult> creatorConf
   );
 
@@ -30,14 +30,14 @@ public interface StepFactory<TInput, TToken> {
   );
 
   default <TClass, TValue> StepBuilder<TInput, NoData> builderSetProperty(
-    Step<TInput, NoData> upperStartObject,
+    Step<TInput, ?> triggerDependency,
     SettablePropertyConfiguration<TClass, TValue> conf,
     Step<TInput, ? extends TClass> instantiationStep
   ) {
     return this.builderSetProperty(
       conf,
       instantiationStep,
-      builderDeserializeProperty(upperStartObject, conf).build()
+      builderDeserializeProperty(triggerDependency, conf).build()
     );
   }
 
@@ -46,18 +46,24 @@ public interface StepFactory<TInput, TToken> {
   TToken tokenEndObject();
 
   default <TClass, TValue> StepBuilder<TInput, ? extends TValue> builderDeserializeProperty(
-    Step<TInput, NoData> upperStartObject,
+    Step<TInput, ?> triggerDependency,
     PropertyConfiguration<TClass, TValue> conf
   ) {
-    final StepBuilder<TInput, ? extends TValue> builder = builderDeserializeValue(upperStartObject, conf);
+    Step<TInput, ?> expectFieldName = null;
     if (!conf.isUnwrapped()) {
-      builder.addDependency(builderExpectToken(tokenFieldName(), conf.getName(), true).build());
+      StepBuilder<TInput, ?> expectFieldNameBuilder = builderExpectToken(tokenFieldName(), conf.getName(), true);
+      if (triggerDependency != null) expectFieldNameBuilder.addDependency(triggerDependency);
+      expectFieldName = expectFieldNameBuilder.build();
+    }
+    final StepBuilder<TInput, ? extends TValue> builder = builderDeserializeValue(expectFieldName, conf);
+    if (expectFieldName != null) {
+      builder.addDependency(expectFieldName);
     }
     return builder;
   }
 
   default <TResult> StepBuilder<TInput, ? extends TResult> builderDeserializeValue(
-    Step<TInput, NoData> upperStartObject,
+    Step<TInput, ?> triggerDependency,
     PropertyConfiguration<?, TResult> conf
   ) {
     if (conf.getTypeConfiguration().isStandardType()) {
@@ -67,33 +73,35 @@ public interface StepFactory<TInput, TToken> {
     if (typeConf.isCollection()) {
       return builderDeserializeArray(typeConf);
     }
-    return builderDeserializeBeanValue(upperStartObject, typeConf, conf.isUnwrapped());
+    return builderDeserializeBeanValue(triggerDependency, typeConf, conf.isUnwrapped());
   }
 
   default <TResult> StepBuilder<TInput, ? extends TResult> builderDeserializeBeanValue(
-    Step<TInput, NoData> upperStartObject,
+    Step<TInput, ?> triggerDependency,
     TypeConfiguration<TResult> typeConf,
     boolean unwrapped
   ) {
     if (!unwrapped) {
       final StepBuilder<TInput, NoData> expectStartToken = builderExpectTokenKind(tokenStartObject());
-      if (upperStartObject != null) {
-        expectStartToken.addDependency(upperStartObject);
+      if (triggerDependency != null) {
+        expectStartToken.addDependency(triggerDependency);
       }
-      upperStartObject = expectStartToken.build();
+      triggerDependency = expectStartToken.build();
     }
     final StepBuilder<TInput, ? extends TResult> builderStepInstantiate =
       typeConf.hasCreator()
-        ? builderInstantiateUsing(upperStartObject, typeConf.getCreatorConfiguration())
+        ? builderInstantiateUsing(triggerDependency, typeConf.getCreatorConfiguration())
         : builderInstantiateUsingDefaultConstructor(typeConf);
-    builderStepInstantiate.addDependency(upperStartObject);
+    if (triggerDependency != null) {
+      builderStepInstantiate.addDependency(triggerDependency);
+    }
     final Step<TInput, ? extends TResult> stepInstantiate = builderStepInstantiate.build();
     final StepBuilder<TInput, ? extends TResult> builderRoot = builderStepAlso(stepInstantiate);
-    final Step<TInput, NoData> finalUpperStartObject = upperStartObject;
+    final Step<TInput, ?> finalTriggerDependency = triggerDependency;
     typeConf
       .getProperties()
       .stream()
-      .map(c -> builderSetProperty(finalUpperStartObject, c, stepInstantiate))
+      .map(c -> builderSetProperty(finalTriggerDependency, c, stepInstantiate))
       .map(StepBuilder::build)
       .forEach(builderRoot::addDependency);
     if (!unwrapped) {
