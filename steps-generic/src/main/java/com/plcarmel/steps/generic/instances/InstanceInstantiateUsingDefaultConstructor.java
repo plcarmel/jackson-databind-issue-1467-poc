@@ -12,6 +12,10 @@ public final class InstanceInstantiateUsingDefaultConstructor<TInput, TResult>
 {
   private final TypeConfiguration<TResult> typeConfiguration;
 
+  public TypeConfiguration<TResult> getTypeConfiguration() {
+    return typeConfiguration;
+  }
+
   public InstanceInstantiateUsingDefaultConstructor(
     TypeConfiguration<TResult> typeConfiguration,
     InstanceGroupMany<TInput> unmanaged

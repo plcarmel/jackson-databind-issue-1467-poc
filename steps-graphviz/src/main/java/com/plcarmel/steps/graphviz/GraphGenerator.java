@@ -12,25 +12,25 @@ import java.util.function.Supplier;
 
 public interface GraphGenerator<TDep extends HasDependencies<TDep>> {
 
-  Converter<TDep> getConverter(HasDependencies<TDep> step);
+  Converter<TDep> getConverter(TDep step);
 
   Supplier<String> getIdGenerator();
 
-  default void generateNodes(Map<HasDependencies<TDep>, Node> nodes, HasDependencies<TDep> currentStep) {
+  default void generateNodes(Map<TDep, Node> nodes, TDep currentStep) {
     nodes.put(currentStep, getConverter(currentStep).getNode(currentStep, getIdGenerator()));
     currentStep.getDependencies().forEach(d -> generateNodes(nodes, d));
   }
 
-  default Map<HasDependencies<TDep>, Node> generateNodes(HasDependencies<TDep> finalStep) {
-    final Map<HasDependencies<TDep>, Node> result = new HashMap<>();
+  default Map<TDep, Node> generateNodes(TDep finalStep) {
+    final Map<TDep, Node> result = new HashMap<>();
     generateNodes(result, finalStep);
     return result;
   }
 
   default Graph linkGraph(
-    Function<HasDependencies<TDep>, Node> getNode,
+    Function<TDep, Node> getNode,
     Graph g,
-    HasDependencies<TDep> currentStep
+    TDep currentStep
   ) {
     return currentStep
       .getDependencies()
@@ -42,12 +42,12 @@ public interface GraphGenerator<TDep extends HasDependencies<TDep>> {
       );
   }
 
-  default Graph generateGraph(Graph g, HasDependencies<TDep> finalStep) {
-    final Map<HasDependencies<TDep>, Node> nodes = generateNodes(finalStep);
+  default Graph generateGraph(Graph g, TDep finalStep) {
+    final Map<TDep, Node> nodes = generateNodes(finalStep);
     return linkGraph(nodes::get, g, finalStep);
   }
 
-  default Graph generateGraph(HasDependencies<TDep> finalStep) {
+  default Graph generateGraph(TDep finalStep) {
     return generateGraph(Factory.graph().directed(), finalStep);
   }
 

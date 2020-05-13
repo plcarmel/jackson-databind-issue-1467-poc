@@ -23,10 +23,10 @@ public class ObjectMapper {
         .getInstance()
         .builderDeserializeBeanValue(CachedTypeConfigurationFactory.getInstance().getTypeConfiguration(valueType));
     final Interpreter<JsonParser, ? extends T> interpreter = new Interpreter<>(builder.build());
-    if (onNewGraph != null) onNewGraph.accept(interpreter.getFinalStep());
     final JsonParser parser = JsonFactory.builder().build().createParser(content);
     parser.nextToken();
     while (parser.hasCurrentToken()) {
+      if (onNewGraph != null) onNewGraph.accept(interpreter.getFinalStep());
       interpreter.pushToken(parser);
     }
     interpreter.eof();

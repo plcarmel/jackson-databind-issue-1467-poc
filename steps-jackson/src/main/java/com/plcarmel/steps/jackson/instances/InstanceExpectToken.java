@@ -20,43 +20,50 @@ import java.util.stream.Stream;
 
 public final class InstanceExpectToken
   extends
-  InstanceUnmanagedBase<JsonParser, NoData>
+    InstanceUnmanagedBase<JsonParser, NoData>
   implements
-  GetDependenciesMixin<InstanceGroup<JsonParser>, StepInstance<JsonParser, ?>>,
-  RemoveDependencyFromListMixin<JsonParser, NoData>,
-  CleanMixin<JsonParser, NoData>,
+    GetDependenciesMixin<InstanceGroup<JsonParser>, StepInstance<JsonParser, ?>>,
+    RemoveDependencyFromListMixin<JsonParser, NoData>,
+    CleanMixin<JsonParser, NoData>,
     NoDataMixin<JsonParser>,
     NonExecutableMixin<JsonParser, NoData>
 {
   private final JsonToken expectedTokenKind;
   private final Object expectedTokenValue;
   private final boolean useTokenValue;
-  private final boolean isOptional;
 
   private boolean tokenReceived = false;
+
+  public JsonToken getExpectedTokenKind() {
+    return expectedTokenKind;
+  }
+
+  public Object getExpectedTokenValue() {
+    return expectedTokenValue;
+  }
+
+  public boolean isUseTokenValue() {
+    return useTokenValue;
+  }
 
   public InstanceExpectToken(
     JsonToken expectedTokenKind,
     Object expectedTokenValue,
-    boolean isOptional,
     InstanceGroupMany<JsonParser> unmanaged
   ) {
     super(unmanaged);
     this.expectedTokenKind = expectedTokenKind;
     this.expectedTokenValue = expectedTokenValue;
-    this.isOptional = isOptional;
     useTokenValue = true;
   }
 
   public InstanceExpectToken(
     JsonToken expectedTokenKind,
-    boolean isOptional,
     InstanceGroupMany<JsonParser> unmanaged
   ) {
     super(unmanaged);
     this.expectedTokenKind = expectedTokenKind;
     this.expectedTokenValue = null;
-    this.isOptional = isOptional;
     useTokenValue = false;
   }
 
@@ -64,7 +71,8 @@ public final class InstanceExpectToken
   public boolean canHandleCurrentToken(JsonParser parser) {
     try {
       return parser.currentToken() == expectedTokenKind &&
-        (!useTokenValue || parser.getCurrentName().equals(expectedTokenValue));
+        (!useTokenValue || parser.getCurrentName().equals(expectedTokenValue)) &&
+        getDependencies().isEmpty();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -80,7 +88,7 @@ public final class InstanceExpectToken
 
   @Override
   public boolean isOptional() {
-    return isOptional;
+    return false;
   }
 
   @Override

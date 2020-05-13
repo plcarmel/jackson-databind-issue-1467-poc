@@ -21,6 +21,10 @@ public class StepExpectToken
   private final boolean isOptional;
   private final StepGroupMany<JsonParser> unmanaged;
 
+  public JsonToken getExpectedTokenKind() {
+    return expectedTokenKind;
+  }
+
   public StepExpectToken(
     JsonToken expectedTokenKind,
     Object expectedTokenValue,
@@ -52,13 +56,11 @@ public class StepExpectToken
       ? new InstanceExpectToken(
         expectedTokenKind,
         expectedTokenValue,
-        isOptional,
-        unmanaged.instantiated(factory)
+      unmanaged.instantiated(factory)
       )
       : new InstanceExpectToken(
         expectedTokenKind,
-        isOptional,
-        unmanaged.instantiated(factory)
+      unmanaged.instantiated(factory)
       );
   }
 

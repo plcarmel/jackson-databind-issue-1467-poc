@@ -13,6 +13,7 @@ public interface StepFactory<TInput, TToken> {
   );
 
   <TResult> StepBuilder<TInput, ? extends TResult> builderInstantiateUsing(
+    Step<TInput, NoData> upperStartObject,
     CreatorConfiguration<TResult> creatorConf
   );
 
@@ -29,10 +30,15 @@ public interface StepFactory<TInput, TToken> {
   );
 
   default <TClass, TValue> StepBuilder<TInput, NoData> builderSetProperty(
+    Step<TInput, NoData> upperStartObject,
     SettablePropertyConfiguration<TClass, TValue> conf,
     Step<TInput, ? extends TClass> instantiationStep
   ) {
-    return this.builderSetProperty(conf, instantiationStep, builderDeserializeProperty(conf).build());
+    return this.builderSetProperty(
+      conf,
+      instantiationStep,
+      builderDeserializeProperty(upperStartObject, conf).build()
+    );
   }
 
   TToken tokenFieldName();
@@ -40,9 +46,10 @@ public interface StepFactory<TInput, TToken> {
   TToken tokenEndObject();
 
   default <TClass, TValue> StepBuilder<TInput, ? extends TValue> builderDeserializeProperty(
+    Step<TInput, NoData> upperStartObject,
     PropertyConfiguration<TClass, TValue> conf
   ) {
-    final StepBuilder<TInput, ? extends TValue> builder = builderDeserializeValue(conf);
+    final StepBuilder<TInput, ? extends TValue> builder = builderDeserializeValue(upperStartObject, conf);
     if (!conf.isUnwrapped()) {
       builder.addDependency(builderExpectToken(tokenFieldName(), conf.getName(), true).build());
     }
@@ -50,6 +57,7 @@ public interface StepFactory<TInput, TToken> {
   }
 
   default <TResult> StepBuilder<TInput, ? extends TResult> builderDeserializeValue(
+    Step<TInput, NoData> upperStartObject,
     PropertyConfiguration<?, TResult> conf
   ) {
     if (conf.getTypeConfiguration().isStandardType()) {
@@ -59,30 +67,39 @@ public interface StepFactory<TInput, TToken> {
     if (typeConf.isCollection()) {
       return builderDeserializeArray(typeConf);
     }
-    return builderDeserializeBeanValue(typeConf, conf.isUnwrapped());
+    return builderDeserializeBeanValue(upperStartObject, typeConf, conf.isUnwrapped());
   }
 
   default <TResult> StepBuilder<TInput, ? extends TResult> builderDeserializeBeanValue(
+    Step<TInput, NoData> upperStartObject,
     TypeConfiguration<TResult> typeConf,
     boolean unwrapped
   ) {
+    if (!unwrapped) {
+      final StepBuilder<TInput, NoData> expectStartToken = builderExpectTokenKind(tokenStartObject());
+      if (upperStartObject != null) {
+        expectStartToken.addDependency(upperStartObject);
+      }
+      upperStartObject = expectStartToken.build();
+    }
     final StepBuilder<TInput, ? extends TResult> builderStepInstantiate =
       typeConf.hasCreator()
-      ? builderInstantiateUsing(typeConf.getCreatorConfiguration())
-      : builderInstantiateUsingDefaultConstructor(typeConf);
-    if (!unwrapped) {
-      builderStepInstantiate.addDependency(builderExpectTokenKind(tokenStartObject()).build());
-    }
+        ? builderInstantiateUsing(upperStartObject, typeConf.getCreatorConfiguration())
+        : builderInstantiateUsingDefaultConstructor(typeConf);
+    builderStepInstantiate.addDependency(upperStartObject);
     final Step<TInput, ? extends TResult> stepInstantiate = builderStepInstantiate.build();
     final StepBuilder<TInput, ? extends TResult> builderRoot = builderStepAlso(stepInstantiate);
+    final Step<TInput, NoData> finalUpperStartObject = upperStartObject;
     typeConf
       .getProperties()
       .stream()
-      .map(c -> builderSetProperty(c, stepInstantiate))
+      .map(c -> builderSetProperty(finalUpperStartObject, c, stepInstantiate))
       .map(StepBuilder::build)
       .forEach(builderRoot::addDependency);
     if (!unwrapped) {
-      builderRoot.addDependency(builderExpectTokenKind(tokenEndObject()).build());
+      final StepBuilder<TInput, NoData> builderExpectEndObject = builderExpectTokenKind(tokenEndObject());
+      builderExpectEndObject.addDependency(stepInstantiate);
+      builderRoot.addDependency(builderExpectEndObject.build());
     }
     return builderRoot;
   }
@@ -90,6 +107,6 @@ public interface StepFactory<TInput, TToken> {
   default <TResult> StepBuilder<TInput, ? extends TResult> builderDeserializeBeanValue(
     TypeConfiguration<TResult> typeConf
   ) {
-    return builderDeserializeBeanValue(typeConf, false);
+    return builderDeserializeBeanValue(null, typeConf, false);
   }
 }

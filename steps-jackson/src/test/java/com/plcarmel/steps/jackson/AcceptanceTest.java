@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.core.JsonParser;
-import com.plcarmel.steps.graphviz.SimpleGraphGenerator;
+import com.plcarmel.steps.graphviz.ConfigurableGraphGenerator;
+import com.plcarmel.steps.graphviz.InstanceConverter;
+import com.plcarmel.steps.jackson.graphviz.*;
 import com.plcarmel.steps.theory.StepInstance;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
@@ -13,7 +15,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Objects;
+import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.*;
@@ -95,19 +97,23 @@ public class AcceptanceTest {
     assertEquals(result.w, 1234);
   }
 
-  public static class ClassWithNonStandardConstructorProperty {
-    public final ClassWithPublicFieldStandardProperty hello;
-    public ClassWithNonStandardConstructorProperty(@JsonProperty("world") ClassWithPublicFieldStandardProperty hello) {
-      this.hello = hello;
-    }
-  }
-
   private int i = 0;
 
   private final static Format graphFormat = Format.SVG;
 
   private void printGraph(StepInstance<JsonParser, ?> finalStep) {
-    final SimpleGraphGenerator<StepInstance<JsonParser, ?>> graphGenerator = new SimpleGraphGenerator<>();
+    final ConfigurableGraphGenerator<StepInstance<JsonParser, ?>> graphGenerator =
+      new ConfigurableGraphGenerator<>(
+        Stream.of(
+          new SetPropertyConverter(),
+          new AlsoConverter(),
+          new InstantiateUsingDefaultConstructorConverter(),
+          new InstantiateUsingCreatorConverter(),
+          new ExpectTokenConverter(),
+          new DeserializeStandardValueConverter(),
+          new InstanceConverter<>()
+        )
+      );
     try {
       Graphviz
         .fromGraph(graphGenerator.generateGraph(finalStep))
@@ -127,6 +133,14 @@ public class AcceptanceTest {
     Arrays.stream(requireNonNull(files)).forEach(File::delete);
   }
 
+  public static class ClassWithNonStandardConstructorProperty {
+    public final ClassWithPublicFieldStandardProperty hello;
+    @JsonCreator
+    public ClassWithNonStandardConstructorProperty(@JsonProperty("world") ClassWithPublicFieldStandardProperty hello) {
+      this.hello = hello;
+    }
+  }
+
   @Test
   public void constructorNonStandardPropertyTest() throws IOException {
     final String str = "{ \"world\": { \"x\": 1234 } }";
@@ -137,6 +151,5 @@ public class AcceptanceTest {
     assertNotNull(result.hello);
     assertEquals(result.hello.x,1234);
   }
-
 
 }

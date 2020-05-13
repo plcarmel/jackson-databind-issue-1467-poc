@@ -17,6 +17,10 @@ public final class InstanceInstantiateUsingCreator<TInput, TResult>
   private final CreatorConfiguration<TResult> conf;
   private final InstanceGroupMany<TInput> parameters;
 
+  public CreatorConfiguration<TResult> getConf() {
+    return conf;
+  }
+
   public InstanceInstantiateUsingCreator(
     CreatorConfiguration<TResult> conf,
     InstanceGroupMany<TInput> parameters,

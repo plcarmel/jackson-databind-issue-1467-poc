@@ -9,27 +9,25 @@ import guru.nidi.graphviz.model.Node;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
 public interface Converter<TDep extends HasDependencies<TDep>> {
 
-  default boolean canConvert(HasDependencies<TDep> stepInstance) {
+  default boolean canConvert(TDep stepInstance) {
     return true;
   }
 
-  default Node getNode(HasDependencies<TDep> stepInstance, Supplier<String> newId) {
-    final String id = newId.get();
+  default Node getNode(TDep stepInstance, Supplier<String> newId) {
     return Factory
-      .node(id)
-      .with(Label.of(String.format("[%s] %s", id, stepInstance.getClass().getSimpleName())));
+      .node(newId.get())
+      .with(Label.of(String.format("%s", stepInstance.getClass().getSimpleName())));
   }
 
   default Graph addNodeLinks(
     Graph g,
-    HasDependencies<TDep> stepInstance,
-    Function<HasDependencies<TDep>, Node> getNode
+    TDep stepInstance,
+    Function<TDep, Node> getNode
   ) {
     final Node current = getNode.apply(stepInstance);
     return g.with(

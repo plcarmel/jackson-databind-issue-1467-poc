@@ -23,16 +23,20 @@ import static com.fasterxml.jackson.core.JsonToken.VALUE_TRUE;
 
 public final class InstanceDeserializeStandardValue<TResult>
   extends
-  InstanceUnmanagedBase<JsonParser, TResult>
+    InstanceUnmanagedBase<JsonParser, TResult>
   implements
-  GetDependenciesMixin<InstanceGroup<JsonParser>, StepInstance<JsonParser, ?>>,
-  RemoveDependencyFromListMixin<JsonParser, TResult>,
-  CleanMixin<JsonParser, TResult>,
+    GetDependenciesMixin<InstanceGroup<JsonParser>, StepInstance<JsonParser, ?>>,
+    RemoveDependencyFromListMixin<JsonParser, TResult>,
+    CleanMixin<JsonParser, TResult>,
     NonExecutableMixin<JsonParser, TResult>
 {
   private final PropertyConfiguration<?, TResult> conf;
   private TResult data;
   private boolean isPropertyDeserialized = false;
+
+  public PropertyConfiguration<?, TResult> getConf() {
+    return conf;
+  }
 
   public InstanceDeserializeStandardValue(
     PropertyConfiguration<?, TResult> conf,
@@ -86,7 +90,7 @@ public final class InstanceDeserializeStandardValue<TResult>
 
   @Override
   public boolean isOptional() {
-    return !conf.isRequired();
+    return false;
   }
 
   @Override

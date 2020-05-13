@@ -31,6 +31,10 @@ public final class InstanceSetProperty<TInput, TClass, TValue>
   private final InstanceGroupOne<TInput, ? extends TValue> deserializationStep;
   private boolean hasBeenExecuted;
 
+  public SettablePropertyConfiguration<TClass, TValue> getPropertyConfiguration() {
+    return propertyConfiguration;
+  }
+
   public InstanceSetProperty(
     SettablePropertyConfiguration<TClass, TValue> propertyConfiguration,
     InstanceGroupOne<TInput, ? extends TClass> instantiationStep,
