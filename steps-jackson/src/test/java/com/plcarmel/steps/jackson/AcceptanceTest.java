@@ -3,21 +3,11 @@ package com.plcarmel.steps.jackson;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.fasterxml.jackson.core.JsonParser;
-import com.plcarmel.steps.graphviz.ConfigurableGraphGenerator;
-import com.plcarmel.steps.graphviz.InstanceConverter;
 import com.plcarmel.steps.jackson.graphviz.*;
-import com.plcarmel.steps.theory.StepInstance;
-import guru.nidi.graphviz.engine.Format;
-import guru.nidi.graphviz.engine.Graphviz;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.stream.Stream;
 
-import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.*;
 
 public class AcceptanceTest {
@@ -97,42 +87,6 @@ public class AcceptanceTest {
     assertEquals(result.w, 1234);
   }
 
-  private int i = 0;
-
-  private final static Format graphFormat = Format.SVG;
-
-  private void printGraph(StepInstance<JsonParser, ?> finalStep) {
-    final ConfigurableGraphGenerator<StepInstance<JsonParser, ?>> graphGenerator =
-      new ConfigurableGraphGenerator<>(
-        Stream.of(
-          new SetPropertyConverter(),
-          new AlsoConverter(),
-          new InstantiateUsingDefaultConstructorConverter(),
-          new InstantiateUsingCreatorConverter(),
-          new ExpectTokenConverter(),
-          new DeserializeStandardValueConverter(),
-          new InstanceConverter<>()
-        )
-      );
-    try {
-      Graphviz
-        .fromGraph(graphGenerator.generateGraph(finalStep))
-        .height(500)
-        .render(graphFormat)
-        .toFile(new File("target/graph" + (++i) + "." + graphFormat.fileExtension));
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private void removePreviousGraphs() {
-    final File[] files =
-        new File("target")
-          .listFiles(s -> s.getName().matches("graph.*\\." + graphFormat.fileExtension));
-    //noinspection ResultOfMethodCallIgnored
-    Arrays.stream(requireNonNull(files)).forEach(File::delete);
-  }
-
   public static class ClassWithNonStandardConstructorProperty {
     public final ClassWithPublicFieldStandardProperty hello;
     @JsonCreator
@@ -144,9 +98,10 @@ public class AcceptanceTest {
   @Test
   public void constructorNonStandardPropertyTest() throws IOException {
     final String str = "{ \"world\": { \"x\": 1234 } }";
-    removePreviousGraphs();
+    GraphRenderer.removePreviousGraphs();
+    final GraphRenderer renderer = new GraphRenderer();
     final ClassWithNonStandardConstructorProperty result =
-      new ObjectMapper().readValue(str, ClassWithNonStandardConstructorProperty.class, this::printGraph);
+      new ObjectMapper().readValue(str, ClassWithNonStandardConstructorProperty.class, renderer::printGraph);
     assertNotNull(result);
     assertNotNull(result.hello);
     assertEquals(result.hello.x,1234);
