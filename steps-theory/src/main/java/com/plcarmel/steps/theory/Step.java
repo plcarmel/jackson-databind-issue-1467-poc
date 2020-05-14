@@ -3,6 +3,13 @@ package com.plcarmel.steps.theory;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A parser terminal / production rule class.
+ *
+ * @param <TInput> Input used to fetch new tokens
+ * @param <TResult> Result
+ */
+
 public interface Step<TInput, TResult> extends HasDependencies<Step<TInput, ?>> {
 
   StepInstance<TInput, TResult> instantiated(InstanceFactory<TInput> factory);

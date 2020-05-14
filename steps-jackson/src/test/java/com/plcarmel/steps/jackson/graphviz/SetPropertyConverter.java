@@ -3,7 +3,6 @@ package com.plcarmel.steps.jackson.graphviz;
 import com.fasterxml.jackson.core.JsonParser;
 import com.plcarmel.steps.generic.instances.InstanceSetProperty;
 import com.plcarmel.steps.graphviz.InstanceConverter;
-import com.plcarmel.steps.jackson.instances.InstanceExpectToken;
 import com.plcarmel.steps.theory.StepInstance;
 import guru.nidi.graphviz.attribute.Font;
 import guru.nidi.graphviz.attribute.Label;
@@ -32,6 +31,6 @@ public class SetPropertyConverter extends InstanceConverter<JsonParser> {
           Font.name("monospace"),
           Font.size(10)
         );
-    return applyColor(stepInstance, node);
+    return applyDefaultStyles(stepInstance, node);
   }
 }

@@ -34,6 +34,6 @@ public class ExpectTokenConverter extends InstanceConverter<JsonParser> {
           Font.name("monospace"),
           Font.size(8)
         );
-    return applyColor(stepInstance, node);
+    return applyDefaultStyles(stepInstance, node);
   }
 }

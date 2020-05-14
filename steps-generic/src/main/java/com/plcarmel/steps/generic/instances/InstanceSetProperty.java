@@ -58,6 +58,16 @@ public final class InstanceSetProperty<TInput, TClass, TValue>
   }
 
   @Override
+  public boolean isSubstitution() {
+    return true;
+  }
+
+  @Override
+  public boolean isTerminal() {
+    return false;
+  }
+
+  @Override
   public Boolean isReadyToBeExecuted() {
     return instantiationStep.get().isDone() && deserializationStep.get().isDone();
   }

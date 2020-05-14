@@ -48,6 +48,6 @@ public class InstantiateUsingCreatorConverter extends InstanceConverter<JsonPars
           Font.name("monospace"),
           Font.size(10)
         );
-    return applyColor(stepInstance, node);
+    return applyDefaultStyles(stepInstance, node);
   }
 }

@@ -92,6 +92,16 @@ public final class InstanceExpectToken
   }
 
   @Override
+  public boolean isSubstitution() {
+    return false;
+  }
+
+  @Override
+  public boolean isTerminal() {
+    return true;
+  }
+
+  @Override
   public boolean hasTokenBeenReceived() {
     return tokenReceived;
   }

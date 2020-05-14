@@ -21,6 +21,6 @@ public class AlsoConverter extends InstanceConverter<JsonParser> {
   public Node getNode(StepInstance<JsonParser, ?> stepInstance, Supplier<String> newId) {
     final String id = newId.get();
     final Node node = Factory.node(id).with(Label.of("&"));
-    return applyColor(stepInstance, node);
+    return applyDefaultStyles(stepInstance, node);
   }
 }

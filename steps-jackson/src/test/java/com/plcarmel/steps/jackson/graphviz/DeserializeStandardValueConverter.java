@@ -29,13 +29,13 @@ public class DeserializeStandardValueConverter extends InstanceConverter<JsonPar
         .with(
           Label.of(
             String.format(
-              "parse %s",
+              "%s",
               deserializeStandardValue.getConf().getTypeConfiguration().getType().getSimpleName()
             )
           ),
           Font.name("monospace"),
           Font.size(8)
         );
-    return applyColor(stepInstance, node);
+    return applyDefaultStyles(stepInstance, node);
   }
 }

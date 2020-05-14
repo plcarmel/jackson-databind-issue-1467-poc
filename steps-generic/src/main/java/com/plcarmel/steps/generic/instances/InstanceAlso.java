@@ -40,6 +40,16 @@ public final class InstanceAlso<TInput, TResult>
   }
 
   @Override
+  public boolean isSubstitution() {
+    return true;
+  }
+
+  @Override
+  public boolean isTerminal() {
+    return false;
+  }
+
+  @Override
   public boolean hasTokenBeenReceived() {
     return getData() != null;
   }

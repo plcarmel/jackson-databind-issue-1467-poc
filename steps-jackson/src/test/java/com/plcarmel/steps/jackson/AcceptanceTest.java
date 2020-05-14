@@ -89,8 +89,9 @@ public class AcceptanceTest {
 
   public static class ClassWithNonStandardConstructorProperty {
     public final ClassWithPublicFieldStandardProperty hello;
-    @JsonCreator
-    public ClassWithNonStandardConstructorProperty(@JsonProperty("world") ClassWithPublicFieldStandardProperty hello) {
+    @JsonCreator public ClassWithNonStandardConstructorProperty(
+      @JsonProperty("world") ClassWithPublicFieldStandardProperty hello
+    ) {
       this.hello = hello;
     }
   }
@@ -98,10 +99,29 @@ public class AcceptanceTest {
   @Test
   public void constructorNonStandardPropertyTest() throws IOException {
     final String str = "{ \"world\": { \"x\": 1234 } }";
+    final ClassWithNonStandardConstructorProperty result =
+      new ObjectMapper().readValue(str, ClassWithNonStandardConstructorProperty.class);
+    assertNotNull(result);
+    assertNotNull(result.hello);
+    assertEquals(result.hello.x,1234);
+  }
+
+  public static class ClassWithUnwrappedConstructorProperty {
+    public final ClassWithPublicFieldStandardProperty hello;
+    @JsonCreator public ClassWithUnwrappedConstructorProperty(
+      @JsonUnwrapped @JsonProperty("world") ClassWithPublicFieldStandardProperty hello
+    ) {
+      this.hello = hello;
+    }
+  }
+
+  @Test
+  public void constructorUnwrappedPropertyTest() throws IOException {
+    final String str = "{ \"x\": 1234 }";
     GraphRenderer.removePreviousGraphs();
     final GraphRenderer renderer = new GraphRenderer();
-    final ClassWithNonStandardConstructorProperty result =
-      new ObjectMapper().readValue(str, ClassWithNonStandardConstructorProperty.class, renderer::printGraph);
+    final ClassWithUnwrappedConstructorProperty result =
+      new ObjectMapper().readValue(str, ClassWithUnwrappedConstructorProperty.class, renderer::printGraph);
     assertNotNull(result);
     assertNotNull(result.hello);
     assertEquals(result.hello.x,1234);

@@ -17,6 +17,9 @@ public interface StepInstance<TInput, TResult>
    */
   boolean isOptional();
 
+  boolean isSubstitution();
+  boolean isTerminal();
+
   /**
    * @return
    *   Returns true if the computation or side effect of the step can be performed. It can be true only when there

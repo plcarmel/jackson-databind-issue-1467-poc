@@ -32,6 +32,6 @@ public class InstantiateUsingDefaultConstructorConverter extends InstanceConvert
           Font.name("monospace"),
           Font.size(10)
         );
-    return applyColor(stepInstance, node);
+    return applyDefaultStyles(stepInstance, node);
   }
 }

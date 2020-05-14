@@ -2,6 +2,7 @@ package com.plcarmel.steps.graphviz;
 
 import com.plcarmel.steps.theory.StepInstance;
 import guru.nidi.graphviz.attribute.Color;
+import guru.nidi.graphviz.attribute.Shape;
 import guru.nidi.graphviz.model.Node;
 
 import java.util.function.Supplier;
@@ -23,8 +24,18 @@ public class InstanceConverter<TInput> implements Converter<StepInstance<TInput,
     return node.with(color, fontColor.font());
   }
 
+  public static Node applyShape(StepInstance<?, ?> stepInstance, Node node) {
+    return stepInstance.isTerminal()
+      ? node.with(Shape.OCTAGON)
+      : node;
+  }
+
+  public static Node applyDefaultStyles(StepInstance<?, ?> stepInstance, Node node) {
+    return applyShape(stepInstance, applyColor(stepInstance, node));
+  }
+
   @Override
   public Node getNode(StepInstance<TInput, ?> stepInstance, Supplier<String> newId) {
-    return applyColor(stepInstance, Converter.super.getNode(stepInstance, newId));
+    return applyDefaultStyles(stepInstance, Converter.super.getNode(stepInstance, newId));
   }
 }

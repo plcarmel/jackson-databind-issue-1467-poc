@@ -29,6 +29,16 @@ public abstract class InstanceInstantiateBase<TInput, TResult>
   }
 
   @Override
+  public boolean isSubstitution() {
+    return true;
+  }
+
+  @Override
+  public boolean isTerminal() {
+    return false;
+  }
+
+  @Override
   public TResult getData() {
     return data;
   }
